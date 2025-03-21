@@ -75,6 +75,7 @@ export const Structure = () => {
                 <Label htmlFor="body">Body</Label>
                 <TextEditor />
             </div>
+
         </div>
     );
 };

@@ -17,13 +17,14 @@ export const Editor: React.FC = () => {
             <Topbar />
             <Separator className="h-[0.2px] bg-accent" />
             <div className="flex w-full min-h-full relative px-3 max-w-[1440px] mx-auto overflow-x-hidden">
+                <Separator orientation="vertical" />
                 <ArticleLayers />
                 <Separator orientation="vertical" />
                 <ListLayers />
                 <Separator orientation="vertical" />
                 <ActiveTask />
                 <Separator orientation="vertical" />
-                <Toolbar />
+                {/* <Toolbar /> */}
             </div>
         </main>
     )
