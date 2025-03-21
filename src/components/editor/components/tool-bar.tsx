@@ -8,6 +8,8 @@ import {
     AlignLeft,
     AlignRight,
     Bold,
+    Code,
+    Eraser,
     Heading1,
     Heading2,
     Heading3,
@@ -15,9 +17,14 @@ import {
     Italic,
     List,
     ListOrdered,
+    Minus,
+    Redo,
     Strikethrough,
+    Undo,
+    Upload,
 } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
+import { ChangeEvent } from "react";
 
 export const Toolbar = ({ editor }: { editor: Editor | null }) => {
 
@@ -86,6 +93,50 @@ export const Toolbar = ({ editor }: { editor: Editor | null }) => {
             onClick: () => editor.chain().focus().toggleHighlight().run(),
             preesed: editor.isActive("highlight"),
         },
+        {
+            icon: <Code className="size-4" />,
+            onClick: () => editor.commands.toggleCode(),
+            preesed: editor.isActive("code"),
+        },
+        {
+            icon: <Minus className="size-4" />,
+            onClick: () => editor.chain().focus().setHorizontalRule().run(),
+            preesed: false,
+        },
+        {
+            icon: <Eraser className="size-4" />,
+            onClick: () => editor.chain().focus().unsetAllMarks().clearNodes().run(),
+            preesed: false,
+        },
+        {
+            icon: <Undo className="size-4" />,
+            onClick: () => editor.chain().focus().undo().run(),
+            preesed: false,
+        },
+        {
+            icon: <Redo className="size-4" />,
+            onClick: () => editor.chain().focus().redo().run(),
+            preesed: false,
+        },
+        {
+            icon: <Upload className="size-4" />,
+            onClick: () => {
+                const input = document.createElement("input");
+                input.type = "file";
+                input.accept = "image/*";
+                input.onchange = async (event: any) => {
+                    const file = event.target.files?.[0];
+                    if (!file) return;
+
+                    const objectURL = URL.createObjectURL(file);
+
+                    editor.chain().focus().setImage({ src: objectURL }).run();
+                };
+                input.click();
+            },
+            preesed: false,
+        },
+
     ];
     return (
         <div className="flex gap-5 sticky top-0 bg-background z-500">
