@@ -1,4 +1,4 @@
-import { Separator } from "@radix-ui/react-separator"
+import { Separator } from "../ui/separator"
 import { Topbar } from "./components/top-bar"
 import { Button } from "@/components/ui/button"
 import {
@@ -9,7 +9,7 @@ import {
 import { ArticleLayers } from "./components/subject-layers"
 import { ListLayers } from "./components/list-layers"
 import { ActiveTask } from "./components/active-task"
-
+import { Toolbar } from "./components/tool-bar"
 
 export const Editor: React.FC = () => {
     return (
@@ -18,11 +18,12 @@ export const Editor: React.FC = () => {
             <Separator className="h-[0.2px] bg-accent" />
             <div className="flex w-full min-h-full relative px-3 max-w-[1440px] mx-auto overflow-x-hidden">
                 <ArticleLayers />
-                <Separator orientation="vertical" className="bg-accent w-[0.2px]" />
+                <Separator orientation="vertical" />
                 <ListLayers />
-                <Separator orientation="vertical" className="bg-accent w-[0.2px]" />
+                <Separator orientation="vertical" />
                 <ActiveTask />
-                <Separator orientation="vertical" className="bg-accent w-[0.2px]" />
+                <Separator orientation="vertical" />
+                <Toolbar />
             </div>
         </main>
     )
