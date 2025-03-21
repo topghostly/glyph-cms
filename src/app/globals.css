@@ -110,13 +110,13 @@
     @apply bg-background text-foreground;
   }
   h1 {
-    @apply text-3xl font-bold;
+    @apply text-3xl font-bold mt-4 mb-2;
   }
   h2 {
-    @apply text-2xl font-bold;
+    @apply text-2xl font-bold mt-3 mb-2;
   }
   h3 {
-    @apply text-xl font-bold;
+    @apply text-xl font-bold mt-2 mb-1;
   }
 }
 

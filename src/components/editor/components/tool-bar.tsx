@@ -1,6 +1,6 @@
 "use client";
 
-import { useEditorContext } from "@/store/editor";
+// import { useEditorContext } from "@/store/editor";
 import { Editor } from "@tiptap/react";
 
 import {
@@ -24,7 +24,6 @@ import {
     Upload,
 } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
-import { ChangeEvent } from "react";
 
 export const Toolbar = ({ editor }: { editor: Editor | null }) => {
 
