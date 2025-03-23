@@ -17,7 +17,7 @@ const getStore = (initialState: { blogs: Blog[]; isSearching: false }) => {
         },
         deleteBlog: (id: string) => {
           set((state) => ({
-            blogs: state.blogs.filter((blog) => blog._localID === id),
+            blogs: state.blogs.filter((blog) => blog._localID !== id),
           }));
         },
         updateBlog: (blog: Blog) => {
@@ -31,7 +31,7 @@ const getStore = (initialState: { blogs: Blog[]; isSearching: false }) => {
               activeBlog:
                 state.activeBlog?._localID === blog._localID
                   ? blog
-                  : state.activeBlog, // Ensure activeBlog gets updated
+                  : state.activeBlog,
             };
           });
         },
@@ -42,7 +42,7 @@ const getStore = (initialState: { blogs: Blog[]; isSearching: false }) => {
           }));
         },
         activeTask: "structure",
-        setActiveTask: (task: "structure" | "preview" | "code") => {
+        setActiveTask: (task: "structure" | "preview" | "code" | null) => {
           set((state) => ({ activeTask: task }));
         },
         isSearching: false,

@@ -7,12 +7,15 @@ import {
 } from "@/components/ui/popover";
 import Image from "next/image";
 import { useBlogStore } from "@/store/blog-store";
+import { cn } from "@/lib/utils";
+import { ActiveTask } from "./active-task";
 
 export const Topbar: React.FC = () => {
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
   const addBlog = useBlogStore((state) => state.addBlog);
   const setActiveTask = useBlogStore((state) => state.setActiveTask);
   const setActiveBlog = useBlogStore((state) => state.setActiveBlog);
+  const activeTask = useBlogStore((state) => state.activeTask);
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
 
   return (
@@ -49,15 +52,29 @@ export const Topbar: React.FC = () => {
       <div className="h-full flex gap-3 justify-center items-center">
         <Button
           size={"sm"}
-          className="text-white/80 text-[12px]"
+          className={cn(
+            `${
+              activeTask === "structure"
+                ? "text-white/80 text-[12px]"
+                : "border-none bg-background text-white text-[12px]"
+            }`
+          )}
           variant={"outline"}
+          onClick={() => setActiveTask("structure")}
         >
           Structure
         </Button>
         <Button
           variant={"outline"}
           size={"sm"}
-          className="border-none bg-background text-white text-[12px]"
+          className={cn(
+            `${
+              activeTask === "preview"
+                ? "text-white/80 text-[12px]"
+                : "border-none bg-background text-white text-[12px]"
+            }`
+          )}
+          onClick={() => setActiveTask("preview")}
         >
           Preview
         </Button>

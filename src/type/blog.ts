@@ -24,8 +24,8 @@ export type BlogState = {
   updateBlog: (blog: Blog) => void;
   activeBlog: Blog | null;
   setActiveBlog: (id: string | null) => void;
-  activeTask: "structure" | "preview" | "code";
-  setActiveTask: (task: "structure" | "preview" | "code") => void;
+  activeTask: null | "structure" | "preview" | "code";
+  setActiveTask: (task: null | "structure" | "preview" | "code") => void;
   isSearching: boolean;
   setIsSearcing: (mode: boolean) => void;
   listMode: "all" | "category";

@@ -1,7 +1,15 @@
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useBlogStore } from "@/store/blog-store";
-import { Plus, Search } from "lucide-react";
+import { Ellipsis, Plus, Search, Trash2, UserRoundPen } from "lucide-react";
 import Image from "next/image";
 
 export const PostLayer: React.FC = () => {
@@ -73,13 +81,38 @@ export const PostLayer: React.FC = () => {
                 fill
               />
             </div>
-            <div className="flex flex-col ">
+            <div className="flex flex-col">
               <p className="text-[14px] font-bold truncate w-[170px]">
                 {d.content.title}
               </p>
               <p className="text-[10px]">by Damilare Abolaji</p>
             </div>
-            <div></div>
+            <div>
+              <DropdownMenu>
+                <DropdownMenuTrigger className="outline-none">
+                  <Ellipsis className="cursor-pointer" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        deleteBlog(d._localID);
+                        setActiveTask(null);
+                        setActiveBlog(null);
+                      }}
+                    >
+                      <Trash2 />
+                      <span>Delete Blog</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <UserRoundPen />
+                      <span>Edit Blog</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         ))}
       </div>
