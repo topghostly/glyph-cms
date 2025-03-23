@@ -1,6 +1,25 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { useBlogStore } from "@/store/blog-store";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
+
+export const addNewBlog = () => {
+  /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
+  const addBlog = useBlogStore((state) => state.addBlog);
+  const setActiveTask = useBlogStore((state) => state.setActiveTask);
+  const setActiveBlog = useBlogStore((state) => state.setActiveBlog);
+  /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
+
+  const newBlogID = crypto.randomUUID();
+  addBlog({
+    _localID: newBlogID,
+    content: {
+      title: "Untitled Blog",
+    },
+  });
+  setActiveBlog(newBlogID);
+  setActiveTask("structure");
+};

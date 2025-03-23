@@ -4,36 +4,20 @@ import { useBlogStore } from "@/store/blog-store";
 import { Plus, Search } from "lucide-react";
 import Image from "next/image";
 
-export const PostLayer: React.FC = () => {
+export const CategoryLayer: React.FC = () => {
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
   const blogs = useBlogStore((state) => state.blogs);
   const deleteBlog = useBlogStore((state) => state.deleteBlog);
   const setActiveTask = useBlogStore((state) => state.setActiveTask);
   const activeBlog = useBlogStore((state) => state.activeBlog);
   const setActiveBlog = useBlogStore((state) => state.setActiveBlog);
-  const addBlog = useBlogStore((state) => state.addBlog);
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
 
   return (
     <div className="flex flex-col gap-1">
       <div className="flex justify-between items-center mb-4">
-        <p className="font-bold text-[14px]">Posts</p>
-        <div
-          className="w-7 h-7 grid place-content-center hover:bg-accent rounded"
-          onClick={() => {
-            const newBlogID = crypto.randomUUID();
-            addBlog({
-              _localID: newBlogID,
-              content: {
-                title: "Untitled Blog",
-              },
-            });
-            setActiveBlog(newBlogID);
-            setActiveTask("structure");
-          }}
-        >
-          <Plus size={18} className="text-white/80 cursor-pointer" />
-        </div>
+        <p className="font-bold text-[14px]">Categories</p>
+        {/* <Plus size={18} className="text-white/80 cursor-pointer" /> */}
       </div>
 
       {/* SEARCH INPUT FIELD */}
@@ -65,8 +49,8 @@ export const PostLayer: React.FC = () => {
               <Image
                 className="rounded"
                 src={
-                  d.content.mainImage?.url
-                    ? d.content.mainImage?.url
+                  d.content.mainImageUrl
+                    ? d.content.mainImageUrl
                     : "/images/png/default-image.webp"
                 }
                 alt={"post image"}
