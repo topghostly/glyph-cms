@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ImageUp, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TextEditor } from "./components/text-editor";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -25,7 +25,10 @@ export const Structure = () => {
   const activeBlog = useBlogStore((state) => state.activeBlog);
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
 
+  const scrollableRef = useRef(null);
+
   const [inputValue, setInputValue] = useState<string>("");
+  const [savedBlog, setSavedBlog] = useState<Record<string, any>>({});
   const [blog, setBlog] = useState<Blog>(
     activeBlog || {
       _localID: "",
@@ -40,10 +43,18 @@ export const Structure = () => {
     }
   );
 
+  /* FUNCTION TO SCROLLTO TOP ON BLOG CHANGE */
+  // const scrollToTop = () => {
+  //   if (scrollableRef.current) {
+  //     scrollableRef.current.scrollTo = 0;
+  //   }
+  // };
+
   useEffect(() => {
     if (activeBlog && activeBlog._localID !== blog._localID) {
       setBlog(activeBlog);
     }
+    // scrollToTop();
   }, [activeBlog?._localID]);
 
   useEffect(() => {
@@ -51,6 +62,14 @@ export const Structure = () => {
       updateBlog(blog);
     }
   }, [blog]);
+
+  useEffect(() => {
+    if (blog.content.body) {
+      setSavedBlog(blog.content.body);
+    } else {
+      setSavedBlog({});
+    }
+  }, [blog._localID]);
 
   const handleAddTags = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && inputValue.trim() !== "") {
@@ -78,7 +97,7 @@ export const Structure = () => {
   /* GET MAIN IMAGE */
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
-      const file = acceptedFiles[0]; // Get the first image file
+      const file = acceptedFiles[0];
 
       if (file) {
         const reader = new FileReader();
@@ -93,8 +112,8 @@ export const Structure = () => {
             content: {
               ...prevBlog.content,
               mainImage: {
-                url: base64String, // Ensure the correct key-value pair
-                alt: prevBlog.content.mainImage?.alt || "", // Preserve existing alt text
+                url: base64String,
+                alt: prevBlog.content.mainImage?.alt || "",
               },
             },
           }));
@@ -105,7 +124,7 @@ export const Structure = () => {
         };
       }
     },
-    [updateBlog] // Removed dependency on `blog` to prevent stale state issues
+    [updateBlog]
   );
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -119,7 +138,7 @@ export const Structure = () => {
   });
 
   return (
-    <div className="w-full flex flex-col gap-8 pb-5 relative">
+    <div className="w-full flex flex-col gap-8 pb-5 relative" id="structure">
       {/* BLOG TITLE */}
       <div className="flex flex-col gap-4">
         <Label htmlFor="title" className="text-[12px]">
@@ -262,7 +281,7 @@ export const Structure = () => {
       {/* BODY */}
       <div className="flex flex-col gap-4">
         <Label htmlFor="body">Body</Label>
-        <TextEditor />
+        <TextEditor setBlog={setBlog} savedBlog={savedBlog} />
       </div>
     </div>
   );
