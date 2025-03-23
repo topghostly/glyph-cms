@@ -8,6 +8,7 @@ import { useBlogStore } from "@/store/blog-store";
 export const ActiveTask: React.FC = () => {
   const activeTask = useBlogStore((state) => state.activeTask);
   const setActiveBlog = useBlogStore((state) => state.setActiveBlog);
+  const setActiveTask = useBlogStore((state) => state.setActiveTask);
   const activeBlog = useBlogStore((state) => state.activeBlog);
   return (
     <div className="w-full h-full overflow-y-scroll relative scrollbar-h">
@@ -21,6 +22,7 @@ export const ActiveTask: React.FC = () => {
             className="rotate-45"
             onClick={() => {
               setActiveBlog(null);
+              setActiveTask(null);
             }}
           />
         </div>

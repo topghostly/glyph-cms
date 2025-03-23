@@ -71,7 +71,7 @@ export const PostLayer: React.FC = () => {
           >
             <div className="w-[40px] h-[40px] flex justify-center items-center relative">
               <Image
-                className="rounded"
+                className="rounded object-center object-cover"
                 src={
                   d.content.mainImage?.url
                     ? d.content.mainImage?.url
@@ -83,7 +83,7 @@ export const PostLayer: React.FC = () => {
             </div>
             <div className="flex flex-col">
               <p className="text-[14px] font-bold truncate w-[170px]">
-                {d.content.title}
+                {d.content.title !== "" ? d.content.title : "Untitled Blog"}
               </p>
               <p className="text-[10px]">by Damilare Abolaji</p>
             </div>

@@ -14,11 +14,11 @@ export const ArticleLayers: React.FC = () => {
       svgPath: <Newspaper size={16} />,
       value: "all",
     },
-    {
-      text: "Categories",
-      svgPath: <Tag className="rotate-270" size={16} />,
-      value: "category",
-    },
+    // {
+    //   text: "Categories",
+    //   svgPath: <Tag className="rotate-270" size={16} />,
+    //   value: "category",
+    // },
   ];
   return (
     <div className="flex flex-col basis-[200px] shrink-0 overflow-y-scroll relative scrollbar-h pt-5 gap-5 pr-1 pl-2">

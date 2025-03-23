@@ -41,7 +41,7 @@ const getStore = (initialState: { blogs: Blog[]; isSearching: false }) => {
             activeBlog: state.blogs.find((b) => b._localID === id) || null,
           }));
         },
-        activeTask: "structure",
+        activeTask: null,
         setActiveTask: (task: "structure" | "preview" | "code" | null) => {
           set((state) => ({ activeTask: task }));
         },

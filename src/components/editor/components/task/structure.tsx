@@ -6,7 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ImageUp, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TextEditor } from "./components/text-editor";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useDropzone } from "react-dropzone";
 import { Badge } from "@/components/ui/badge";
 import {
   Tooltip,
@@ -16,6 +17,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useBlogStore } from "@/store/blog-store";
 import { Blog } from "@/type/blog";
+import Image from "next/image";
 
 export const Structure = () => {
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
@@ -25,7 +27,17 @@ export const Structure = () => {
 
   const [inputValue, setInputValue] = useState<string>("");
   const [blog, setBlog] = useState<Blog>(
-    activeBlog || { _localID: "", content: { title: "", tags: [] } }
+    activeBlog || {
+      _localID: "",
+      content: {
+        title: "",
+        tags: [],
+        mainImage: {
+          alt: "",
+          url: "",
+        },
+      },
+    }
   );
 
   useEffect(() => {
@@ -63,6 +75,49 @@ export const Structure = () => {
     }));
   };
 
+  /* GET MAIN IMAGE */
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      const file = acceptedFiles[0]; // Get the first image file
+
+      if (file) {
+        const reader = new FileReader();
+        reader.readAsDataURL(file); // Convert to Base64
+
+        reader.onload = () => {
+          const base64String = reader.result as string; // Ensure it's a string
+
+          // Update blog state immediately so UI updates
+          setBlog((prevBlog) => ({
+            ...prevBlog,
+            content: {
+              ...prevBlog.content,
+              mainImage: {
+                url: base64String, // Ensure the correct key-value pair
+                alt: prevBlog.content.mainImage?.alt || "", // Preserve existing alt text
+              },
+            },
+          }));
+        };
+
+        reader.onerror = (error) => {
+          console.error("Error converting image to Base64:", error);
+        };
+      }
+    },
+    [updateBlog] // Removed dependency on `blog` to prevent stale state issues
+  );
+
+  const { getRootProps, getInputProps } = useDropzone({
+    maxFiles: 1,
+    accept: {
+      "image/png": [".png"],
+      "image/jpg": [".jpg"],
+      "image/jpeg": [".jpeg"],
+    },
+    onDrop,
+  });
+
   return (
     <div className="w-full flex flex-col gap-8 pb-5 relative">
       {/* BLOG TITLE */}
@@ -91,13 +146,28 @@ export const Structure = () => {
         </Label>
         <Card className="w-full p-3">
           <CardContent className="flex flex-col gap-5 px-0">
-            <Card className="w-full aspect-video rounded overflow-hidden">
-              <CardContent className="grid place-content-center w-full h-full">
-                <div>
-                  <ImageUp size={30} color="#cccccc" strokeWidth={2} />
-                </div>
-              </CardContent>
-            </Card>
+            {blog.content.mainImage?.url ? (
+              <div className="w-full relative h-100">
+                <Image
+                  src={blog.content.mainImage.url}
+                  alt="new image"
+                  className="mx-auto rounded object-center object-cover"
+                  fill
+                />
+              </div>
+            ) : (
+              <div {...getRootProps()} className="w-full h-full cursor-pointer">
+                <input {...getInputProps()} type="file" />
+                <Card className="w-full aspect-video rounded overflow-hidden">
+                  <CardContent className="grid place-content-center w-full h-full">
+                    <div>
+                      <ImageUp size={30} color="#cccccc" strokeWidth={2} />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
             <div className="flex flex-col gap-2">
               <Label htmlFor="alternate" className="text-[12px]">
                 Alternate Text
@@ -106,6 +176,19 @@ export const Structure = () => {
                 id="alternate"
                 name="alternate"
                 placeholder="React Context API in image form ..."
+                value={blog.content.mainImage?.alt || ""} // Ensure it's always a string
+                onChange={(e) =>
+                  setBlog({
+                    ...blog,
+                    content: {
+                      ...blog.content,
+                      mainImage: {
+                        ...blog.content.mainImage,
+                        alt: e.target.value,
+                      },
+                    },
+                  })
+                }
               />
             </div>
           </CardContent>
