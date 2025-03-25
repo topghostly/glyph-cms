@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -21,6 +22,12 @@ export const PostLayer: React.FC = () => {
   const setActiveBlog = useBlogStore((state) => state.setActiveBlog);
   const addBlog = useBlogStore((state) => state.addBlog);
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredBlogs = blogs.filter((blog) =>
+    blog.content.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="flex flex-col gap-1">
@@ -46,16 +53,21 @@ export const PostLayer: React.FC = () => {
 
       {/* SEARCH INPUT FIELD */}
       <div className="relative">
-        <div className=" w-fit pointer-events-none absolute top-[50%] translate-y-[-50%] left-[8px]">
+        <div className="w-fit pointer-events-none absolute top-[50%] translate-y-[-50%] left-[8px]">
           <Search size={18} color="#cccccc" strokeWidth={1} />
         </div>
         <div className="w-full">
-          <Input className="pl-9 border-none" placeholder="Search list" />
+          <Input
+            className="pl-9 border-none"
+            placeholder="Search list"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
       </div>
       {/* SEARCH INPUT FIELD */}
       <div className="flex flex-col gap-1 w-full">
-        {blogs.map((d, index) => (
+        {filteredBlogs.map((d, index) => (
           <div
             key={index}
             onClick={() => {

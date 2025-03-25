@@ -25,13 +25,13 @@ import {
 import Image from "next/image";
 import { useBlogStore } from "@/store/blog-store";
 import { cn } from "@/lib/utils";
-// import { auth } from "@/auth";
 import React from "react";
 import { logOut } from "@/server/auth";
 import { useAuth } from "@/store/auth-store";
 
 export const Topbar: React.FC = () => {
   const { session } = useAuth();
+
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
   const addBlog = useBlogStore((state) => state.addBlog);
   const setActiveTask = useBlogStore((state) => state.setActiveTask);
