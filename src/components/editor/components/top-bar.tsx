@@ -1,16 +1,35 @@
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  Cloud,
+  Columns2,
+  FileJson,
+  Github,
+  Keyboard,
+  LayoutPanelTop,
+  LifeBuoy,
+  LogOut,
+  Plus,
+  Settings,
+  User,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import Image from "next/image";
 import { useBlogStore } from "@/store/blog-store";
 import { cn } from "@/lib/utils";
-import { ActiveTask } from "./active-task";
+// import { auth } from "@/auth";
+import React from "react";
 
 export const Topbar: React.FC = () => {
+  // const session = await auth();
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
   const addBlog = useBlogStore((state) => state.addBlog);
   const setActiveTask = useBlogStore((state) => state.setActiveTask);
@@ -62,6 +81,7 @@ export const Topbar: React.FC = () => {
           variant={"outline"}
           onClick={() => setActiveTask("structure")}
         >
+          <LayoutPanelTop />
           Structure
         </Button>
         <Button
@@ -76,33 +96,74 @@ export const Topbar: React.FC = () => {
           )}
           onClick={() => setActiveTask("preview")}
         >
+          <Columns2 />
           Preview
         </Button>
       </div>
       <div className="h-full flex gap-3 justify-center items-center">
-        <Popover>
-          <PopoverTrigger asChild>
+        <div>
+          <Button
+            variant={"outline"}
+            size={"sm"}
+            className="text-white/80 text-[12px]"
+          >
+            <FileJson size={16} /> JSON
+          </Button>
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
             <div className="flex justify-center items-center w-[30px] h-[30px] relative cursor-pointer">
-              <Image
-                src={"/images/png/web-icon.png"}
+              {/* <Image
+                // src={session?.user?.image ?? "/images/png/web-icon.png"}
                 alt="user picture"
                 fill
                 className="pointer-events-none"
-              />
+              /> */}
             </div>
-          </PopoverTrigger>
-          <PopoverContent className="w-80">
-            <div className="grid gap-4">
-              <div className="space-y-2">
-                <h4 className="font-medium leading-none">Dimensions</h4>
-                <p className="text-sm text-muted-foreground">
-                  Set the dimensions for the layer.
-                </p>
-              </div>
-              <div className="grid gap-2"></div>
-            </div>
-          </PopoverContent>
-        </Popover>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-58">
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem>
+                <User />
+                <span>Profile</span>
+                <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem disabled>
+                <Settings />
+                <span>Settings</span>
+                <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+              </DropdownMenuItem>
+              <DropdownMenuItem disabled>
+                <Keyboard />
+                <span>Keyboard shortcuts</span>
+                <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <Github />
+              <span>GitHub</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem disabled>
+              <LifeBuoy />
+              <span>Support</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem disabled>
+              <Cloud />
+              <span>API</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <LogOut />
+              <span>Log out</span>
+              <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );

@@ -34,6 +34,7 @@
     "lowlight": "^3.3.0",
     "lucide-react": "^0.483.0",
     "next": "15.2.3",
+    "next-auth": "^5.0.0-beta.25",
     "next-safe-action": "^7.10.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
