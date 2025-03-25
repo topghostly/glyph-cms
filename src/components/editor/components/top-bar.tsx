@@ -101,17 +101,22 @@ export const Topbar: React.FC = () => {
           <Columns2 />
           Preview
         </Button>
+        <Button
+          variant={"outline"}
+          size={"sm"}
+          className={cn(
+            `${
+              activeTask === "code"
+                ? "text-white/80 text-[12px]"
+                : "border-none bg-background text-white text-[12px]"
+            }`
+          )}
+          onClick={() => setActiveTask("code")}
+        >
+          <FileJson size={16} /> JSON
+        </Button>
       </div>
       <div className="h-full flex gap-3 justify-center items-center">
-        <div>
-          <Button
-            variant={"outline"}
-            size={"sm"}
-            className="text-white/80 text-[12px]"
-          >
-            <FileJson size={16} /> JSON
-          </Button>
-        </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <div className="flex justify-center items-center w-[30px] h-[30px] relative cursor-pointer rounded-full overflow-hidden">
