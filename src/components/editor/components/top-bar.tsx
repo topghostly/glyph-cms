@@ -27,9 +27,11 @@ import { useBlogStore } from "@/store/blog-store";
 import { cn } from "@/lib/utils";
 // import { auth } from "@/auth";
 import React from "react";
+import { logOut } from "@/server/auth";
+import { useAuth } from "@/store/auth-store";
 
 export const Topbar: React.FC = () => {
-  // const session = await auth();
+  const { session } = useAuth();
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
   const addBlog = useBlogStore((state) => state.addBlog);
   const setActiveTask = useBlogStore((state) => state.setActiveTask);
@@ -112,13 +114,13 @@ export const Topbar: React.FC = () => {
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <div className="flex justify-center items-center w-[30px] h-[30px] relative cursor-pointer">
-              {/* <Image
-                // src={session?.user?.image ?? "/images/png/web-icon.png"}
+            <div className="flex justify-center items-center w-[30px] h-[30px] relative cursor-pointer rounded-full overflow-hidden">
+              <Image
+                src={session?.user?.image ?? "/images/png/web-icon.png"}
                 alt="user picture"
                 fill
                 className="pointer-events-none"
-              /> */}
+              />
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-58">
@@ -157,7 +159,11 @@ export const Topbar: React.FC = () => {
               <span>API</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                logOut();
+              }}
+            >
               <LogOut />
               <span>Log out</span>
               <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>

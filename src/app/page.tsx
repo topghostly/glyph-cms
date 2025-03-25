@@ -1,22 +1,18 @@
-"use client";
+"use server";
 
+import { auth } from "@/auth";
 import { Editor } from "@/components/editor/Editor";
-import { AuthProvider } from "@/store/auth-store";
-import { BlogStore } from "@/store/blog-store";
+import { redirect } from "next/navigation";
 
-export default function Home() {
-  return (
-    <AuthProvider>
-      <BlogStore.Provider
-        initialValue={{
-          isSearching: false,
-          blogs: [],
-        }}
-      >
-        <div className="w-screen max-h-screen h-screen bg-background overflow-hidden select-none">
-          <Editor />
-        </div>
-      </BlogStore.Provider>
-    </AuthProvider>
-  );
+export default async function Home() {
+  const session = await auth();
+
+  if (session)
+    return (
+      <div className="w-screen max-h-screen h-screen bg-background overflow-hidden select-none">
+        <Editor session={session} />
+      </div>
+    );
+
+  return redirect("/auth");
 }
