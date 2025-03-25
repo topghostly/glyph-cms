@@ -6,6 +6,7 @@ import { StartBlog } from "./task/start-blog";
 import { useBlogStore } from "@/store/blog-store";
 import { EditorInterface } from "../Editor";
 import { useAuth } from "@/store/auth-store";
+import RichTextRenderer from "./task/preview-blog";
 
 export const ActiveTask: React.FC<EditorInterface> = ({ session }) => {
   const activeTask = useBlogStore((state) => state.activeTask);
@@ -38,7 +39,10 @@ export const ActiveTask: React.FC<EditorInterface> = ({ session }) => {
       <Separator />
       <div className="px-2 pt-5 h-full mx-auto max-w-[750px]">
         {activeBlog ? (
-          <div>{activeTask === "structure" && <Structure />}</div>
+          <>
+            <div>{activeTask === "structure" && <Structure />}</div>
+            <div>{activeTask === "preview" && <RichTextRenderer />}</div>
+          </>
         ) : (
           <StartBlog />
         )}

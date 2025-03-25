@@ -30,6 +30,7 @@ export const TextEditor: React.FC<TextEditorProps> = ({
 }) => {
   const handleUpdate = debounce((editor: Editor) => {
     const html = editor.getJSON();
+    console.log(html);
 
     setBlog((prevBlog) => ({
       ...prevBlog,
@@ -45,12 +46,12 @@ export const TextEditor: React.FC<TextEditorProps> = ({
       StarterKit.configure({
         bulletList: {
           HTMLAttributes: {
-            class: "list-disc ml-3",
+            class: "list-disc ml-4",
           },
         },
         orderedList: {
           HTMLAttributes: {
-            class: "list-decimal ml-3",
+            class: "list-decimal ml-4",
           },
         },
         code: {
@@ -83,11 +84,11 @@ export const TextEditor: React.FC<TextEditorProps> = ({
       Image.configure({
         allowBase64: true,
         HTMLAttributes: {
-          class: "rounded max-w-[90%] h-auto mx-auto ",
+          class: "rounded  mx-auto ",
         },
       }),
     ],
-    // content: "<p>Hello World! 🌎️</p>",
+    content: "<p>Write your Blog body here! 🌎️</p>",
     editorProps: {
       attributes: {
         class:

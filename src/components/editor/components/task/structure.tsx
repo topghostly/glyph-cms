@@ -101,12 +101,11 @@ export const Structure = () => {
 
       if (file) {
         const reader = new FileReader();
-        reader.readAsDataURL(file); // Convert to Base64
+        reader.readAsDataURL(file);
 
         reader.onload = () => {
-          const base64String = reader.result as string; // Ensure it's a string
+          const base64String = reader.result as string;
 
-          // Update blog state immediately so UI updates
           setBlog((prevBlog) => ({
             ...prevBlog,
             content: {
