@@ -8,12 +8,39 @@ import { ArticleLayers } from "./components/subject-layers";
 import { ListLayers } from "./components/list-layers";
 import { ActiveTask } from "./components/active-task";
 import { Session } from "next-auth";
+import { useEffect, useState } from "react";
+import { MonitorCheck } from "lucide-react";
 
 export interface EditorInterface {
   session: Session;
 }
 
 export const Editor: React.FC<EditorInterface> = ({ session }) => {
+  const [isScreenTooSmall, setIsScreenTooSmall] = useState(true);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsScreenTooSmall(window.innerWidth < 920);
+    };
+
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
+  if (isScreenTooSmall) {
+    return (
+      <div className="grid place-content-center min-h-[100vh] min-w-[100vw] w-full h-full">
+        <p className="text-white/60 mt-2 flex justify-center flex-col items-center gap-3 w-[300px] text-center">
+          <MonitorCheck size={30} />
+          Please use a larger screen (at least 950px wide) to access this
+          application.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <AuthProvider>
       <BlogStore.Provider
