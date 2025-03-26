@@ -83,6 +83,7 @@ export const Topbar: React.FC = () => {
           )}
           variant={"outline"}
           onClick={() => setActiveTask("structure")}
+          disabled={!activeTask}
         >
           <LayoutPanelTop />
           Structure
@@ -102,7 +103,9 @@ export const Topbar: React.FC = () => {
           }}
           disabled={
             activeBlog?.content.title === "" ||
-            activeBlog?.content.mainImage?.url === ""
+            activeBlog?.content.title === "Untitled Blog" ||
+            !activeBlog?.content.mainImage?.url ||
+            !activeTask
           }
         >
           <Columns2 />
@@ -119,7 +122,7 @@ export const Topbar: React.FC = () => {
             }`
           )}
           onClick={() => setActiveTask("code")}
-          // disabled={!activeBlog?.content.body === {}}
+          disabled={!activeTask}
         >
           <FileJson size={16} /> JSON
         </Button>
