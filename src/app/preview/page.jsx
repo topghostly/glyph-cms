@@ -2,25 +2,23 @@
 
 import { renderNode } from "@/components/editor/components/task/preview-blog";
 import { getDate } from "@/lib/utils";
+import { Mark } from "@/type/blog";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
+// type Node = {
+//   type: string;
+//   content?: Node[];
+//   text?: string;
+//   marks?: Mark[];
+//   attrs?: Record<string, unknown>;
+// };
+
 export default function PreviewPage() {
-  const [content, setcontent] = useState<{
-    title: string;
-    tags?: string[];
-    mainImage?: {
-      url?: string;
-      alt?: string;
-    };
-    mainImageBlobUrl?: string;
-    body?: Node[];
-    conclusion?: Node[];
-    links?: string[];
-  }>();
+  const [content, setcontent] = useState();
 
   useEffect(() => {
-    const blogs = JSON.parse(localStorage.getItem("local-blogs")!);
+    const blogs = JSON.parse(localStorage.getItem("local-blogs"));
 
     setcontent(blogs.state.activeBlog.content);
   }, []);
@@ -82,7 +80,7 @@ export default function PreviewPage() {
             </div>
           )}
 
-          {content?.body?.content.map((node, index) => renderNode(node, index))}
+          {content?.body?.map((node, index) => renderNode(node, index))}
         </div>
       </div>
     </main>
