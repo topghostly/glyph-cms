@@ -43,15 +43,15 @@ const getStore = (initialState: { blogs: Blog[]; isSearching: false }) => {
         },
         activeTask: null,
         setActiveTask: (task: "structure" | "preview" | "code" | null) => {
-          set((state) => ({ activeTask: task }));
+          set(() => ({ activeTask: task }));
         },
         isSearching: false,
         setIsSearcing: (mode: boolean) => {
-          set((state) => ({ isSearching: mode }));
+          set(() => ({ isSearching: mode }));
         },
         listMode: "all",
         setListMode: (mode: "all" | "category") => {
-          set((state) => ({ listMode: mode }));
+          set(() => ({ listMode: mode }));
         },
       }),
       { name: "local-blogs", storage: createJSONStorage(() => localStorage) }

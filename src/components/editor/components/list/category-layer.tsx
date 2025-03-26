@@ -1,13 +1,13 @@
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useBlogStore } from "@/store/blog-store";
-import { Plus, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import Image from "next/image";
 
 export const CategoryLayer: React.FC = () => {
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
   const blogs = useBlogStore((state) => state.blogs);
-  const deleteBlog = useBlogStore((state) => state.deleteBlog);
+  // const deleteBlog = useBlogStore((state) => state.deleteBlog);
   const setActiveTask = useBlogStore((state) => state.setActiveTask);
   const activeBlog = useBlogStore((state) => state.activeBlog);
   const setActiveBlog = useBlogStore((state) => state.setActiveBlog);

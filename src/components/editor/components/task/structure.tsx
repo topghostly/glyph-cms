@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ImageUp, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TextEditor } from "./components/text-editor";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -16,7 +16,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useBlogStore } from "@/store/blog-store";
-import { Blog } from "@/type/blog";
+import { Blog, BlogState } from "@/type/blog";
 import Image from "next/image";
 
 export const Structure = () => {
@@ -25,10 +25,10 @@ export const Structure = () => {
   const activeBlog = useBlogStore((state) => state.activeBlog);
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
 
-  const scrollableRef = useRef(null);
+  // const scrollableRef = useRef(null);
 
   const [inputValue, setInputValue] = useState<string>("");
-  const [savedBlog, setSavedBlog] = useState<Record<string, any>>({});
+  const [savedBlog, setSavedBlog] = useState<Record<string, Blog>>({});
   const [blog, setBlog] = useState<Blog>(
     activeBlog || {
       _localID: "",

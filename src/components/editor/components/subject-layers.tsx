@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { useBlogStore } from "@/store/blog-store";
-import { Newspaper, Tag } from "lucide-react";
+import { Newspaper } from "lucide-react";
 
 export const ArticleLayers: React.FC = () => {
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */

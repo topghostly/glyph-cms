@@ -4,9 +4,9 @@
 import { Editor } from "@tiptap/react";
 
 import {
-  AlignCenter,
-  AlignLeft,
-  AlignRight,
+  //   AlignCenter,
+  //   AlignLeft,
+  //   AlignRight,
   Bold,
   Code,
   Eraser,
@@ -122,7 +122,7 @@ export const Toolbar = ({ editor }: { editor: Editor | null }) => {
         const input = document.createElement("input");
         input.type = "file";
         input.accept = "image/*";
-        input.onchange = async (event: any) => {
+        input.onchange = async (event) => {
           const file = event.target.files?.[0];
           if (!file) return;
 
