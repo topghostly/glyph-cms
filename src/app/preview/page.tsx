@@ -54,9 +54,9 @@ export default function PreviewPage() {
           <div>
             <h1 className="text-5xl text-gray-800">{content?.title}</h1>
           </div>
-          <div>
+          {content?.mainImage?.url && (
             <Image
-              src={content?.mainImage?.url}
+              src={content.mainImage.url}
               alt={content?.mainImage?.alt || "Blog Image"}
               style={{
                 width: "100%",
@@ -67,7 +67,7 @@ export default function PreviewPage() {
               width={0}
               height={0}
             />
-          </div>
+          )}
 
           {(content?.tags ?? []).length > 0 && (
             <div className="mb-4 flex flex-wrap gap-2">
