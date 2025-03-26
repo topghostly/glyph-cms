@@ -122,12 +122,12 @@ export const Toolbar = ({ editor }: { editor: Editor | null }) => {
         const input = document.createElement("input");
         input.type = "file";
         input.accept = "image/*";
-        input.onchange = async (event) => {
-          const file = event.target.files?.[0];
+        input.onchange = async (event: Event) => {
+          const target = event.target as HTMLInputElement | null;
+          const file = target?.files?.[0];
           if (!file) return;
 
           const objectURL = URL.createObjectURL(file);
-
           editor.chain().focus().setImage({ src: objectURL }).run();
         };
         input.click();
