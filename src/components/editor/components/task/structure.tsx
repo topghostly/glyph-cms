@@ -16,7 +16,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useBlogStore } from "@/store/blog-store";
-import { Blog } from "@/type/blog";
+import { Blog, Node } from "@/type/blog";
 import Image from "next/image";
 
 export const Structure = () => {
@@ -28,7 +28,7 @@ export const Structure = () => {
   // const scrollableRef = useRef(null);
 
   const [inputValue, setInputValue] = useState<string>("");
-  const [savedBlog, setSavedBlog] = useState<Record<string, Blog>>({});
+  const [savedBlog, setSavedBlog] = useState<Node[]>([]);
   const [blog, setBlog] = useState<Blog>(
     activeBlog || {
       _localID: "",
@@ -67,7 +67,7 @@ export const Structure = () => {
     if (blog.content.body) {
       setSavedBlog(blog.content.body);
     } else {
-      setSavedBlog({});
+      setSavedBlog([]);
     }
   }, [blog._localID]);
 

@@ -21,7 +21,7 @@ const lowlight = createLowlight(common);
 
 interface TextEditorProps {
   setBlog: React.Dispatch<React.SetStateAction<Blog>>;
-  savedBlog: Record<string, Blog>;
+  savedBlog: Node[];
 }
 
 export const TextEditor: React.FC<TextEditorProps> = ({
