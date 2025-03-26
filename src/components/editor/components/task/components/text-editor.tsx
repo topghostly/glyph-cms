@@ -13,7 +13,7 @@ import Underline from "@tiptap/extension-underline";
 import Image from "@tiptap/extension-image";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { common, createLowlight } from "lowlight";
-import { Blog } from "@/type/blog";
+import { Blog, Node } from "@/type/blog";
 import { useEffect } from "react";
 import { debounce } from "lodash";
 
@@ -36,7 +36,7 @@ export const TextEditor: React.FC<TextEditorProps> = ({
       ...prevBlog,
       content: {
         ...prevBlog.content,
-        body: html,
+        body: html as Node[],
       },
     }));
   }, 300);

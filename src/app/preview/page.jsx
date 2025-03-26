@@ -2,7 +2,7 @@
 
 import { renderNode } from "@/components/editor/components/task/preview-blog";
 import { getDate } from "@/lib/utils";
-import { Mark } from "@/type/blog";
+// import { Mark } from "@/type/blog";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
@@ -80,7 +80,7 @@ export default function PreviewPage() {
             </div>
           )}
 
-          {content?.body?.map((node, index) => renderNode(node, index))}
+          {content?.body?.content.map((node, index) => renderNode(node, index))}
         </div>
       </div>
     </main>
