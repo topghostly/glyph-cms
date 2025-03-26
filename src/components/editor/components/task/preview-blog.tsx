@@ -1,6 +1,7 @@
 "use client";
 
 import { useBlogStore } from "@/store/blog-store";
+import { WholeWord } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 /** Define TypeScript types */
@@ -17,10 +18,6 @@ type Node = {
   attrs?: Record<string, any>;
 };
 
-type Props = {
-  content: Node[];
-};
-
 const RichTextRenderer: React.FC = () => {
   const [content, setContent] = useState<Node[]>([]);
   const activeBlog = useBlogStore((state) => state.activeBlog);
@@ -33,8 +30,11 @@ const RichTextRenderer: React.FC = () => {
 
   if (!content?.body?.content.map.length)
     return (
-      <div>
-        <p>Unable to view</p>
+      <div className="w-full h-full min-h-[60vh] flex items-center justify-center">
+        <p className="text-accent flex gap-3">
+          <WholeWord />
+          Add content to body
+        </p>
       </div>
     );
 
@@ -46,7 +46,7 @@ const RichTextRenderer: React.FC = () => {
       <div>
         <img
           src={content?.mainImage?.url}
-          alt={content?.mainImage?.alt || ""}
+          alt={content?.mainImage?.alt || "Blog Image"}
           style={{
             width: "100%",
             objectFit: "cover",

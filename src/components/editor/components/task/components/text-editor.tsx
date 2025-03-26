@@ -84,7 +84,7 @@ export const TextEditor: React.FC<TextEditorProps> = ({
       Image.configure({
         allowBase64: true,
         HTMLAttributes: {
-          class: "rounded  mx-auto ",
+          class: "rounded my-10 w-[100%] h-[50vh] object-cover object-center",
         },
       }),
     ],

@@ -37,6 +37,7 @@ export const Topbar: React.FC = () => {
   const setActiveTask = useBlogStore((state) => state.setActiveTask);
   const setActiveBlog = useBlogStore((state) => state.setActiveBlog);
   const activeTask = useBlogStore((state) => state.activeTask);
+  const activeBlog = useBlogStore((state) => state.activeBlog);
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
 
   return (
@@ -97,6 +98,10 @@ export const Topbar: React.FC = () => {
             }`
           )}
           onClick={() => setActiveTask("preview")}
+          disabled={
+            activeBlog?.content.title === "" ||
+            activeBlog?.content.mainImage?.url === ""
+          }
         >
           <Columns2 />
           Preview
@@ -112,6 +117,7 @@ export const Topbar: React.FC = () => {
             }`
           )}
           onClick={() => setActiveTask("code")}
+          // disabled={!activeBlog?.content.body === {}}
         >
           <FileJson size={16} /> JSON
         </Button>
