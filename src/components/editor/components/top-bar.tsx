@@ -97,7 +97,9 @@ export const Topbar: React.FC = () => {
                 : "border-none bg-background text-white text-[12px]"
             }`
           )}
-          onClick={() => setActiveTask("preview")}
+          onClick={() => {
+            window.open("/preview", "_blank");
+          }}
           disabled={
             activeBlog?.content.title === "" ||
             activeBlog?.content.mainImage?.url === ""

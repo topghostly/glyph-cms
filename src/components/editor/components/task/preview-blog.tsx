@@ -74,7 +74,7 @@ const RichTextRenderer: React.FC = () => {
   );
 };
 
-const renderNode = (node: Node, index: number): React.ReactNode => {
+export const renderNode = (node: Node, index: number): React.ReactNode => {
   switch (node.type) {
     case "paragraph":
       if (!node.content) return <br key={index} />;
@@ -132,7 +132,7 @@ const renderNode = (node: Node, index: number): React.ReactNode => {
   }
 };
 
-const renderText = (node: Node): JSX.Element[] | null => {
+export const renderText = (node: Node): JSX.Element[] | null => {
   if (!node.content) return null;
   return node.content.map((textNode, index) => {
     if (textNode.type === "text") {
@@ -181,7 +181,7 @@ const renderText = (node: Node): JSX.Element[] | null => {
   });
 };
 
-const renderListItem = (node: Node, index: number): React.ReactNode => {
+export const renderListItem = (node: Node, index: number): React.ReactNode => {
   return <li key={index}>{node.content?.map(renderText)}</li>;
 };
 
