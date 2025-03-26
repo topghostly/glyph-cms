@@ -6,7 +6,18 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 export default function PreviewPage() {
-  const [content, setcontent] = useState();
+  const [content, setcontent] = useState<{
+    title: string;
+    tags?: string[];
+    mainImage?: {
+      url?: string;
+      alt?: string;
+    };
+    mainImageBlobUrl?: string;
+    body?: Node[];
+    conclusion?: Node[];
+    links?: string[];
+  }>();
 
   useEffect(() => {
     const blogs = JSON.parse(localStorage.getItem("local-blogs")!);
@@ -58,9 +69,9 @@ export default function PreviewPage() {
             />
           </div>
 
-          {content?.tags?.length > 0 && (
+          {content?.tags?.length! > 0 && (
             <div className="mb-4 flex flex-wrap gap-2">
-              {content.tags.map((tag, index) => (
+              {content!.tags!.map((tag, index) => (
                 <span
                   key={index}
                   className="bg-gray-200 text-gray-800 px-2 py-0.5 rounded-full text-[10px]"
