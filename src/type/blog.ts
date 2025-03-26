@@ -18,9 +18,9 @@ export type Node = {
   text?: string;
   marks?: Mark[];
   attrs?: {
-    level?: number;
-    src?: string;
-    alt?: string;
+    level?: number; // For headings (h1, h2, etc.)
+    src?: string; // For images
+    alt?: string; // For images
   };
 };
 
@@ -35,7 +35,7 @@ export type Blog = {
       alt?: string;
     };
     mainImageBlobUrl?: string;
-    body?: Node[];
+    body?: Node[]; // Replacing `Record<string,
     conclusion?: Node[];
     links?: string[];
   };

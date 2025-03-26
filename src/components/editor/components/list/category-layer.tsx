@@ -49,8 +49,8 @@ export const CategoryLayer: React.FC = () => {
               <Image
                 className="rounded"
                 src={
-                  d.content.mainImageUrl
-                    ? d.content.mainImageUrl
+                  d.content.mainImage?.url
+                    ? d.content.mainImage?.url
                     : "/images/png/default-image.webp"
                 }
                 alt={"post image"}
