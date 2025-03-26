@@ -1,7 +1,7 @@
 "use client";
 
 import { Auth } from "@/type/auth";
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
 import { Session } from "next-auth";
 
 const AuthContext = createContext<Auth | undefined>(undefined);

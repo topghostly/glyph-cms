@@ -2,13 +2,12 @@
 
 import { Separator } from "../ui/separator";
 import { Topbar } from "./components/top-bar";
-import { AuthProvider, useAuth } from "@/store/auth-store";
+import { AuthProvider } from "@/store/auth-store";
 import { BlogStore } from "@/store/blog-store";
 import { ArticleLayers } from "./components/subject-layers";
 import { ListLayers } from "./components/list-layers";
 import { ActiveTask } from "./components/active-task";
 import { Session } from "next-auth";
-import { useEffect } from "react";
 
 export interface EditorInterface {
   session: Session;

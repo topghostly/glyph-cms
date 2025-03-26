@@ -1,3 +1,29 @@
+export type Mark = {
+  type: "bold" | "italic" | "link" | "strike" | "highlight" | "code";
+  attrs?: { href?: string };
+};
+
+export type Node = {
+  type:
+    | "paragraph"
+    | "heading"
+    | "bulletList"
+    | "orderedList"
+    | "listItem"
+    | "image"
+    | "blockquote"
+    | "codeBlock"
+    | "text";
+  content?: Node[];
+  text?: string;
+  marks?: Mark[];
+  attrs?: {
+    level?: number;
+    src?: string;
+    alt?: string;
+  };
+};
+
 export type Blog = {
   _id?: string;
   _localID: string;
@@ -9,8 +35,8 @@ export type Blog = {
       alt?: string;
     };
     mainImageBlobUrl?: string;
-    body?: Record<string, any>;
-    conclusion?: Record<string, any>;
+    body?: Node[];
+    conclusion?: Node[];
     links?: string[];
   };
   createdAt?: string;

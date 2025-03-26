@@ -2,6 +2,7 @@
 
 import { useBlogStore } from "@/store/blog-store";
 import { WholeWord } from "lucide-react";
+import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
 /** Define TypeScript types */
@@ -10,12 +11,30 @@ type Mark = {
   attrs?: { href?: string };
 };
 
+type NodeAttrs = {
+  level?: number; // For headings
+  src?: string; // For images
+  alt?: string; // For images
+  href?: string; // For links
+  textAlign?: "left" | "center" | "right" | "justify"; // For text alignment
+  start?: number; // For ordered lists
+};
+
 type Node = {
-  type: string;
+  type:
+    | "paragraph"
+    | "heading"
+    | "bulletList"
+    | "orderedList"
+    | "listItem"
+    | "image"
+    | "blockquote"
+    | "codeBlock"
+    | "text";
   content?: Node[];
   text?: string;
   marks?: Mark[];
-  attrs?: Record<string, any>;
+  attrs?: NodeAttrs;
 };
 
 const RichTextRenderer: React.FC = () => {
@@ -44,7 +63,7 @@ const RichTextRenderer: React.FC = () => {
         <h1 className="text-6xl">{content?.title}</h1>
       </div>
       <div>
-        <img
+        <Image
           src={content?.mainImage?.url}
           alt={content?.mainImage?.alt || "Blog Image"}
           style={{
@@ -53,6 +72,8 @@ const RichTextRenderer: React.FC = () => {
             objectPosition: "center",
           }}
           className="my-4 rounded"
+          width={0}
+          height={0}
         />
       </div>
 
@@ -103,17 +124,19 @@ export const renderNode = (node: Node, index: number): React.ReactNode => {
 
     case "image":
       return (
-        <img
+        <Image
           key={index}
           src={node.attrs?.src}
-          alt={node.attrs?.alt || ""}
+          alt={node.attrs?.alt || "no alt image"}
           style={{
             width: "100%",
             height: "50vh",
             objectFit: "cover",
             objectPosition: "center",
           }}
-          className="my-10 rounded"
+          className="my-10 rounded-2xl"
+          width={0}
+          height={0}
         />
       );
 

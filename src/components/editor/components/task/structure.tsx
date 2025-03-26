@@ -16,7 +16,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useBlogStore } from "@/store/blog-store";
-import { Blog, BlogState } from "@/type/blog";
+import { Blog } from "@/type/blog";
 import Image from "next/image";
 
 export const Structure = () => {
@@ -95,36 +95,33 @@ export const Structure = () => {
   };
 
   /* GET MAIN IMAGE */
-  const onDrop = useCallback(
-    (acceptedFiles: File[]) => {
-      const file = acceptedFiles[0];
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const file = acceptedFiles[0];
 
-      if (file) {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
 
-        reader.onload = () => {
-          const base64String = reader.result as string;
+      reader.onload = () => {
+        const base64String = reader.result as string;
 
-          setBlog((prevBlog) => ({
-            ...prevBlog,
-            content: {
-              ...prevBlog.content,
-              mainImage: {
-                url: base64String,
-                alt: prevBlog.content.mainImage?.alt || "",
-              },
+        setBlog((prevBlog) => ({
+          ...prevBlog,
+          content: {
+            ...prevBlog.content,
+            mainImage: {
+              url: base64String,
+              alt: prevBlog.content.mainImage?.alt || "",
             },
-          }));
-        };
+          },
+        }));
+      };
 
-        reader.onerror = (error) => {
-          console.error("Error converting image to Base64:", error);
-        };
-      }
-    },
-    [updateBlog]
-  );
+      reader.onerror = (error) => {
+        console.error("Error converting image to Base64:", error);
+      };
+    }
+  }, []);
 
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: 1,
@@ -192,6 +189,7 @@ export const Structure = () => {
               </Label>
               <Input
                 id="alternate"
+                autoComplete="off"
                 name="alternate"
                 placeholder="React Context API in image form ..."
                 value={blog.content.mainImage?.alt || ""} // Ensure it's always a string
