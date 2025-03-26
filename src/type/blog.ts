@@ -31,28 +31,3 @@ export type BlogState = {
   listMode: "all" | "category";
   setListMode: (mode: "all" | "category") => void;
 };
-
-// {
-//     "type": "doc",
-//     "content": [
-//         {
-//             "type": "paragraph",
-//             "attrs": {
-//                 "textAlign": null
-//             },
-//             "content": [
-//                 {
-//                     "type": "text",
-//                     "text": "Hello World! 🌎️"
-//                 },
-//                 {
-//                     "type": "hardBreak"
-//                 },
-//                 {
-//                     "type": "text",
-//                     "text": "Than"
-//                 }
-//             ]
-//         }
-//     ]
-// }
