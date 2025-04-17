@@ -40,6 +40,34 @@ export const Topbar: React.FC = () => {
   const activeBlog = useBlogStore((state) => state.activeBlog);
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
 
+  const handleCreateUser = async () => {
+    const data = {
+      email: "abolaji@gmail.com",
+    };
+    try {
+      const res = await fetch("/api/user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        // setResponseMessage("User created successfully!");
+        console.log("Added");
+      } else {
+        // setResponseMessage(`Error: ${result.error || "Unknown error"}`);
+        console.log("Not Added");
+      }
+    } catch (error) {
+      // setResponseMessage(`Error: ${error.message}`);
+      console.log(error.message);
+    }
+  };
+
   return (
     <div className="px-3 max-w-[1440px] w-full mx-auto h-15 overflow-hidden flex items-center justify-between">
       <div className="h-full flex gap-3 justify-center items-center select-none">
@@ -68,6 +96,17 @@ export const Topbar: React.FC = () => {
           <span className="flex gap-1 justify-between items-center text-[12px] text-white/80">
             <Plus size={20} strokeWidth={1} />
             Create
+          </span>
+        </Button>
+        <Button
+          size={"sm"}
+          variant={"outline"}
+          onClick={handleCreateUser}
+          className="cursor-pointer"
+        >
+          <span className="flex gap-1 justify-between items-center text-[12px] text-white/80">
+            <Plus size={20} strokeWidth={1} />
+            Make User
           </span>
         </Button>
       </div>

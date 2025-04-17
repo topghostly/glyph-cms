@@ -14,7 +14,7 @@ export default function SignIn() {
   //   const { setSession } = useAuth();
   return (
     <div className="max-w-screen max-h-screen h-screen overflow-hidden flex items-center justify-center">
-      <Card className="w-100 h-fit flex flex-col gap-2">
+      <Card className="max-w-100 w-[90%] h-fit flex flex-col gap-2">
         <CardHeader className="flex flex-col gap-1">
           <Image
             src={"/images/svg/Glyph-01.svg"}
@@ -33,7 +33,7 @@ export default function SignIn() {
             action={async () => {
               "use server";
               await signIn("google", {
-                redirectTo: "/",
+                redirectTo: "/verify",
               });
             }}
           >
