@@ -1,17 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Session } from "next-auth";
 import { useRouter } from "next/navigation";
 import { User } from "@/type/user";
-
+import { useAuth } from "@/store/auth-store";
 import { toast } from "sonner";
 
 export default function HandleDatabase({ session }: { session: Session }) {
-  /* ERROR STATE */
-  //   const [error, setError] = useState("");
-  /* ERROR STATE */
-
+  const { updateUserId } = useAuth();
   const router = useRouter();
 
   const addmailToDB = async (data: User) => {
@@ -25,6 +22,10 @@ export default function HandleDatabase({ session }: { session: Session }) {
       });
 
       const result = await res.json();
+      console.log("Result is:", result.user._id);
+
+      //Update user _id
+      updateUserId(result.user._id);
 
       if (res.ok) {
         toast(`Welcome, ${data.fullname}`);
@@ -42,9 +43,10 @@ export default function HandleDatabase({ session }: { session: Session }) {
 
   useEffect(() => {
     if (session) {
+      if (!session.user?.email || !session.user?.name) return;
       const data: User = {
-        email: session.user?.email!,
-        fullname: session.user?.name!,
+        email: session.user?.email,
+        fullname: session.user?.name,
       };
 
       addmailToDB(data);

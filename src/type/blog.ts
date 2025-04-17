@@ -25,7 +25,6 @@ export type Node = {
 };
 
 export type Blog = {
-  _id?: string;
   _localID: string;
   content: {
     title: string;
@@ -35,12 +34,10 @@ export type Blog = {
       alt?: string;
     };
     mainImageBlobUrl?: string;
-    body?: Node[]; // Replacing `Record<string,
+    body?: Node[];
     conclusion?: Node[];
     links?: string[];
   };
-  createdAt?: string;
-  updatedAt?: string;
 };
 
 export type BlogState = {
