@@ -3,24 +3,31 @@ import {
   ArrowUpToLine,
   Cloud,
   Columns2,
+  File,
   FileJson,
+  FileKey2,
   Github,
   Keyboard,
+  KeySquare,
   LayoutPanelTop,
   LifeBuoy,
   LogOut,
   Plus,
-  Settings,
+  PlusCircle,
   User,
 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
+  DropdownMenuPortal,
+  DropdownMenuSubTrigger,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
@@ -75,7 +82,6 @@ export const Topbar: React.FC = () => {
       toast(`ERROR: ${error}`);
     }
   };
-
   /* FUNCTION TO UPLOAD BLOG TO THE DATABASE */
 
   return (
@@ -194,16 +200,34 @@ export const Topbar: React.FC = () => {
                 <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
               </DropdownMenuItem>
 
-              <DropdownMenuItem disabled>
-                <Settings />
-                <span>Settings</span>
-                <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-              </DropdownMenuItem>
-              <DropdownMenuItem disabled>
-                <Keyboard />
-                <span>Keyboard shortcuts</span>
-                <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
-              </DropdownMenuItem>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <span className="pr-2">
+                    <FileKey2 size={15} />
+                  </span>
+                  <span>Access Key</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuItem
+                      onClick={async () => {
+                        try {
+                          if (!localStorage.getItem("localUserId")) return;
+                          await navigator.clipboard.writeText(
+                            localStorage.getItem("localUserId")!
+                          );
+                          toast("Access key copied");
+                        } catch (error) {
+                          toast("Unable to copy access key");
+                        }
+                      }}
+                    >
+                      <KeySquare size={15} />
+                      <span>{localStorage.getItem("localUserId")}</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuSeparator />
@@ -215,9 +239,16 @@ export const Topbar: React.FC = () => {
               <LifeBuoy />
               <span>Support</span>
             </DropdownMenuItem>
+
+            <DropdownMenuSeparator />
             <DropdownMenuItem disabled>
               <Cloud />
               <span>API</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem disabled>
+              <File />
+              <span>Docs</span>
+              <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem

@@ -8,7 +8,6 @@ export async function POST(req: NextRequest) {
     const { _localID, content, creator } = await req.json();
 
     // Validate input data
-    console.log(_localID, content, creator);
     if (!_localID || !content || !creator) {
       return NextResponse.json(
         { error: "A LocalId, content, and creator are required" },
