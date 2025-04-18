@@ -50,9 +50,6 @@ export const Topbar: React.FC = () => {
       toast("User not authenticated yet. Please try again shortly.");
       return;
     }
-
-    console.log("userId available:", localUserId || "Unknown");
-
     try {
       const res = await fetch("/api/blog/upload", {
         method: "POST",

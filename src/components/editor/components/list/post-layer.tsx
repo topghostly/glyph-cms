@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { useBlogStore } from "@/store/blog-store";
 import { Ellipsis, Plus, Search, Trash2, UserRoundPen } from "lucide-react";
 import Image from "next/image";
+import { toast } from "sonner";
 
 export const PostLayer: React.FC = () => {
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
@@ -23,7 +24,33 @@ export const PostLayer: React.FC = () => {
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
 
   /* FUNCTION TO DELETE A BLOG */
-  const handleBlogDelete = async () => {};
+  const handleBlogDelete = async (blogLocalId: string) => {
+    try {
+      const res = await fetch("/api/blog/delete-blog", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          _localID: blogLocalId,
+        }),
+      });
+
+      const result = await res.json();
+
+      console.log(result);
+      if (res.ok) {
+        deleteBlog(blogLocalId);
+        setActiveTask(null);
+        setActiveBlog(null);
+        toast(`Blog has been deleted`);
+      } else {
+        console.log("Blog not deleted");
+      }
+    } catch (error) {
+      toast(`Error deleting blog: ${error}`);
+    }
+  };
   /* FUNCTION TO DELETE A BLOG */
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -113,9 +140,7 @@ export const PostLayer: React.FC = () => {
                     <DropdownMenuItem
                       onClick={(event) => {
                         event.stopPropagation();
-                        deleteBlog(d._localID);
-                        setActiveTask(null);
-                        setActiveBlog(null);
+                        handleBlogDelete(d._localID);
                       }}
                     >
                       <Trash2 />
