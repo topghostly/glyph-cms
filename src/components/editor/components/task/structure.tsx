@@ -56,13 +56,13 @@ export const Structure = () => {
       setBlog(activeBlog);
     }
     // scrollToTop();
-  }, [activeBlog?._localID]);
+  }, [activeBlog?._localID, activeBlog, blog._localID]);
 
   useEffect(() => {
     if (blog._localID) {
       updateBlog(blog);
     }
-  }, [blog]);
+  }, [blog, updateBlog]);
 
   useEffect(() => {
     if (blog.content.body) {
@@ -70,7 +70,7 @@ export const Structure = () => {
     } else {
       setSavedBlog([]);
     }
-  }, [blog._localID]);
+  }, [blog._localID, blog.content.body]);
 
   const handleAddTags = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && inputValue.trim() !== "") {
