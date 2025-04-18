@@ -7,13 +7,11 @@ import {
   FileJson,
   FileKey2,
   Github,
-  Keyboard,
   KeySquare,
   LayoutPanelTop,
   LifeBuoy,
   LogOut,
   Plus,
-  PlusCircle,
   User,
 } from "lucide-react";
 import {
@@ -33,14 +31,20 @@ import {
 import Image from "next/image";
 import { useBlogStore } from "@/store/blog-store";
 import { cn } from "@/lib/utils";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { logOut } from "@/server/auth";
 import { useAuth } from "@/store/auth-store";
 import { Blog } from "@/type/blog";
 import { toast } from "sonner";
+import isEqual from "lodash.isequal";
+import { getAllBlogs } from "@/util/getAllBlog";
 
 export const Topbar: React.FC = () => {
   const { session } = useAuth();
+
+  const [syncMode, setSyncMode] = useState<boolean>(false);
+  const [uploadTrigger, setUploadTrigger] = useState(false);
+  const [uploading, setUploading] = useState<boolean>(false);
 
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
   const addBlog = useBlogStore((state) => state.addBlog);
@@ -58,6 +62,7 @@ export const Topbar: React.FC = () => {
       return;
     }
     try {
+      setUploading(true);
       const res = await fetch("/api/blog/upload", {
         method: "POST",
         headers: {
@@ -72,17 +77,37 @@ export const Topbar: React.FC = () => {
 
       const result = await res.json();
       console.log(result);
+      await getAllBlogs();
 
       if (res.ok) {
-        toast(`${blog?.content.title} has been uploaded`);
+        toast(`'${blog?.content.title}' has been uploaded`);
+        setUploadTrigger((prev) => !prev);
       } else {
         console.log("Blog not uploaded ");
       }
     } catch (error) {
       toast(`ERROR: ${error}`);
+    } finally {
+      setUploading(false);
     }
   };
   /* FUNCTION TO UPLOAD BLOG TO THE DATABASE */
+
+  useEffect(() => {
+    if (!localStorage.getItem("online-blogs") || !activeBlog) return;
+    const allOnlineBlog = JSON.parse(localStorage.getItem("online-blogs")!);
+
+    const blog = allOnlineBlog.filter(
+      (b: Blog) => b._localID === activeBlog?._localID
+    );
+
+    if (!blog[0]) return setSyncMode(false);
+
+    if (blog) {
+      const blogContent = JSON.parse(blog[0].content);
+      setSyncMode(isEqual(blogContent.content, activeBlog?.content));
+    }
+  }, [activeBlog, uploadTrigger]);
 
   return (
     <div className="px-3 max-w-[1440px] w-full mx-auto h-15 overflow-hidden flex items-center justify-between">
@@ -174,10 +199,24 @@ export const Topbar: React.FC = () => {
       </div>
       <div className="h-full flex gap-3 justify-center items-center">
         <div
-          className="p-2 rounded-full border-[2px] text-white/80 border-white/5 cursor-pointer"
-          onClick={() => handleBlogUpload(activeBlog)}
+          className={cn(
+            "p-2 rounded-full border-[2px] cursor-pointer duration-150",
+            syncMode
+              ? "border-green-950 text-green-300 hover:bg-green-950"
+              : "border-amber-950 text-amber-300 hover:bg-amber-950",
+            !activeBlog && "text-white/80 border-white/5 hover:bg-white/10"
+          )}
+          onClick={() => {
+            if (!syncMode && activeBlog) handleBlogUpload(activeBlog);
+          }}
         >
-          <ArrowUpToLine size={16} />
+          {uploading ? (
+            <div className="flex items-center justify-center">
+              <div className="w-[15px] h-[15px] border-1 border-amber-300 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : (
+            <ArrowUpToLine size={15} strokeWidth={3} />
+          )}
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -219,6 +258,7 @@ export const Topbar: React.FC = () => {
                           toast("Access key copied");
                         } catch (error) {
                           toast("Unable to copy access key");
+                          console.log(error);
                         }
                       }}
                     >

@@ -47,7 +47,7 @@ export default function HandleDatabase({ session }: { session: Session }) {
 
       addMailToDB(data);
     }
-  }, [session]);
+  }, [session, addMailToDB]);
 
   return null;
 }

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectToDB from "@/lib/mongodb";
 import Blog from "@/models/blog";
-import isEqual from "lodash.isequal";
 
 export async function POST(req: NextRequest) {
   try {
