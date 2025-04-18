@@ -38,6 +38,7 @@ export type Blog = {
     conclusion?: Node[];
     links?: string[];
   };
+  creator: string;
 };
 
 export type BlogState = {
@@ -54,3 +55,9 @@ export type BlogState = {
   listMode: "all" | "category";
   setListMode: (mode: "all" | "category") => void;
 };
+
+export interface BlogUpload {
+  _localID: string;
+  content: string;
+  creator: string;
+}

@@ -22,6 +22,10 @@ export const PostLayer: React.FC = () => {
   const addBlog = useBlogStore((state) => state.addBlog);
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
 
+  /* FUNCTION TO DELETE A BLOG */
+  const handleBlogDelete = async () => {};
+  /* FUNCTION TO DELETE A BLOG */
+
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredBlogs = blogs.filter((blog) =>
@@ -41,6 +45,7 @@ export const PostLayer: React.FC = () => {
               content: {
                 title: "Untitled Blog",
               },
+              creator: localStorage.getItem("localUserId") ?? "Unknown",
             });
             setActiveBlog(newBlogID);
             setActiveTask("structure");

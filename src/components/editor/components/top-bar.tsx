@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import {
+  ArrowUpToLine,
   Cloud,
   Columns2,
   FileJson,
@@ -28,6 +29,8 @@ import { cn } from "@/lib/utils";
 import React from "react";
 import { logOut } from "@/server/auth";
 import { useAuth } from "@/store/auth-store";
+import { Blog } from "@/type/blog";
+import { toast } from "sonner";
 
 export const Topbar: React.FC = () => {
   const { session } = useAuth();
@@ -39,6 +42,44 @@ export const Topbar: React.FC = () => {
   const activeTask = useBlogStore((state) => state.activeTask);
   const activeBlog = useBlogStore((state) => state.activeBlog);
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
+
+  /* FUNCTION TO UPLOAD BLOG TO THE DATABASE */
+  const handleBlogUpload = async (blog: Blog | null) => {
+    const localUserId = localStorage.getItem("localUserId");
+    if (!localUserId) {
+      toast("User not authenticated yet. Please try again shortly.");
+      return;
+    }
+
+    console.log("userId available:", localUserId || "Unknown");
+
+    try {
+      const res = await fetch("/api/blog/upload", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          _localID: blog?._localID,
+          content: JSON.stringify(blog),
+          creator: localUserId || "Unknown",
+        }),
+      });
+
+      const result = await res.json();
+      console.log(result);
+
+      if (res.ok) {
+        toast(`${blog?.content.title} has been uploaded`);
+      } else {
+        console.log("Blog not uploaded ");
+      }
+    } catch (error) {
+      toast(`ERROR: ${error}`);
+    }
+  };
+
+  /* FUNCTION TO UPLOAD BLOG TO THE DATABASE */
 
   return (
     <div className="px-3 max-w-[1440px] w-full mx-auto h-15 overflow-hidden flex items-center justify-between">
@@ -59,6 +100,7 @@ export const Topbar: React.FC = () => {
               content: {
                 title: "Untitled Blog",
               },
+              creator: localStorage.getItem("localUserId") ?? "Unknown",
             });
             setActiveBlog(newBlogID);
             setActiveTask("structure");
@@ -128,6 +170,12 @@ export const Topbar: React.FC = () => {
         </Button>
       </div>
       <div className="h-full flex gap-3 justify-center items-center">
+        <div
+          className="p-2 rounded-full border-[2px] text-white/80 border-white/5 cursor-pointer"
+          onClick={() => handleBlogUpload(activeBlog)}
+        >
+          <ArrowUpToLine size={16} />
+        </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <div className="flex justify-center items-center w-[30px] h-[30px] relative cursor-pointer rounded-full overflow-hidden">

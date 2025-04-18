@@ -40,6 +40,7 @@ export const Structure = () => {
           url: "",
         },
       },
+      creator: localStorage.getItem("localUserId") ?? "Unknown",
     }
   );
 

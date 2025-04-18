@@ -1,51 +1,5 @@
-import mongoose, { Schema, Types } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-// Define Mark schema
-const MarkSchema = new Schema(
-  {
-    type: {
-      type: String,
-      enum: ["bold", "italic", "link", "strike", "highlight", "code"],
-      required: true,
-    },
-    attrs: {
-      href: String,
-    },
-  },
-  { _id: false }
-);
-
-// Define Node schema
-const NodeSchema = new Schema(
-  {
-    type: {
-      type: String,
-      enum: [
-        "paragraph",
-        "heading",
-        "bulletList",
-        "orderedList",
-        "listItem",
-        "image",
-        "blockquote",
-        "codeBlock",
-        "text",
-      ],
-      required: true,
-    },
-    content: [this], // Recursive Node
-    text: String,
-    marks: [MarkSchema],
-    attrs: {
-      level: Number,
-      src: String,
-      alt: String,
-    },
-  },
-  { _id: false }
-);
-
-// Define Blog schema
 const BlogSchema = new Schema(
   {
     _localID: {
@@ -53,23 +7,11 @@ const BlogSchema = new Schema(
       required: true,
     },
     content: {
-      title: {
-        type: String,
-        required: true,
-      },
-      tags: [String],
-      mainImage: {
-        url: String,
-        alt: String,
-      },
-      mainImageBlobUrl: String,
-      body: [NodeSchema],
-      conclusion: [NodeSchema],
-      links: [String],
+      type: String,
+      required: true,
     },
     creator: {
-      type: Types.ObjectId,
-      ref: "User",
+      type: String,
       required: true,
     },
   },

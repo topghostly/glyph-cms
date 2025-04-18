@@ -4,14 +4,12 @@ import { useEffect } from "react";
 import { Session } from "next-auth";
 import { useRouter } from "next/navigation";
 import { User } from "@/type/user";
-import { useAuth } from "@/store/auth-store";
 import { toast } from "sonner";
 
 export default function HandleDatabase({ session }: { session: Session }) {
-  const { updateUserId } = useAuth();
   const router = useRouter();
 
-  const addmailToDB = async (data: User) => {
+  const addMailToDB = async (data: User) => {
     try {
       const res = await fetch("/api/user", {
         method: "POST",
@@ -22,36 +20,34 @@ export default function HandleDatabase({ session }: { session: Session }) {
       });
 
       const result = await res.json();
-      console.log("Result is:", result.user._id);
 
-      //Update user _id
-      updateUserId(result.user._id);
-
-      if (res.ok) {
+      if (res.ok && result.user?._id) {
+        console.log("✅ Received user ID from backend:", result.user._id);
+        localStorage.setItem("localUserId", result.user._id);
         toast(`Welcome, ${data.fullname}`);
-        console.log("Added");
         router.replace("/");
       } else {
-        toast(`ERROR: An error occured, please try again`);
+        toast(`❌ An error occurred, please try again.`);
+        console.error("Error result from server:", result);
         router.replace("/auth");
       }
     } catch (error) {
-      toast(`ERROR: ${error}`);
+      toast(`❌ ERROR: ${error}`);
+      console.error("API error:", error);
       router.replace("/auth");
     }
   };
 
   useEffect(() => {
-    if (session) {
-      if (!session.user?.email || !session.user?.name) return;
+    if (session?.user?.email && session.user.name) {
       const data: User = {
-        email: session.user?.email,
-        fullname: session.user?.name,
+        email: session.user.email,
+        fullname: session.user.name,
       };
 
-      addmailToDB(data);
+      addMailToDB(data);
     }
-  });
+  }, [session]);
 
   return null;
 }

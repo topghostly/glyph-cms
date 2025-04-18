@@ -30,7 +30,6 @@ export const TextEditor: React.FC<TextEditorProps> = ({
 }) => {
   const handleUpdate = debounce((editor: Editor) => {
     const html = editor.getJSON();
-    console.log(html);
 
     setBlog((prevBlog) => ({
       ...prevBlog,
