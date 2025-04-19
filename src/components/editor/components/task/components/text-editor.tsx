@@ -95,10 +95,10 @@ export const TextEditor: React.FC<TextEditorProps> = ({
       },
     },
     onUpdate: ({ editor }) => handleUpdate(editor),
+    immediatelyRender: false,
   });
 
   useEffect(() => {
-    // console.log("Saved Blog", savedBlog);
     if (editor) {
       editor?.commands.setContent(savedBlog);
     }
