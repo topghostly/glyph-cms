@@ -102,7 +102,7 @@ export const TextEditor: React.FC<TextEditorProps> = ({
     if (editor) {
       editor?.commands.setContent(savedBlog);
     }
-  }, [editor, savedBlog]);
+  }, [editor]);
 
   return (
     <div className="flex flex-col gap-3">

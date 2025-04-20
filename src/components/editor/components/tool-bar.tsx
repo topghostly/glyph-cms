@@ -12,7 +12,7 @@ import {
   Eraser,
   Heading1,
   Heading2,
-  Heading3,
+  // Heading3,
   Highlighter,
   Italic,
   List,
@@ -21,7 +21,7 @@ import {
   Redo,
   Strikethrough,
   Undo,
-  Upload,
+  // Upload,
 } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
 
@@ -31,18 +31,18 @@ export const Toolbar = ({ editor }: { editor: Editor | null }) => {
   }
 
   const OPTIONS = [
+    // {
+    //   icon: <Heading1 className="size-4" />,
+    //   onClick: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
+    //   preesed: editor.isActive("heading", { level: 1 }),
+    // },
     {
       icon: <Heading1 className="size-4" />,
-      onClick: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
-      preesed: editor.isActive("heading", { level: 1 }),
-    },
-    {
-      icon: <Heading2 className="size-4" />,
       onClick: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
       preesed: editor.isActive("heading", { level: 2 }),
     },
     {
-      icon: <Heading3 className="size-4" />,
+      icon: <Heading2 className="size-4" />,
       onClick: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
       preesed: editor.isActive("heading", { level: 3 }),
     },
@@ -77,12 +77,12 @@ export const Toolbar = ({ editor }: { editor: Editor | null }) => {
     //     preesed: editor.isActive({ textAlign: "right" }),
     // },
     {
-      icon: <List className="size-4" />,
+      icon: <ListOrdered className="size-4" />,
       onClick: () => editor.chain().focus().toggleBulletList().run(),
       preesed: editor.isActive("bulletList"),
     },
     {
-      icon: <ListOrdered className="size-4" />,
+      icon: <List className="size-4" />,
       onClick: () => editor.chain().focus().toggleOrderedList().run(),
       preesed: editor.isActive("orderedList"),
     },
@@ -116,24 +116,24 @@ export const Toolbar = ({ editor }: { editor: Editor | null }) => {
       onClick: () => editor.chain().focus().redo().run(),
       preesed: false,
     },
-    {
-      icon: <Upload className="size-4" />,
-      onClick: () => {
-        const input = document.createElement("input");
-        input.type = "file";
-        input.accept = "image/*";
-        input.onchange = async (event: Event) => {
-          const target = event.target as HTMLInputElement | null;
-          const file = target?.files?.[0];
-          if (!file) return;
+    // {
+    //   icon: <Upload className="size-4" />,
+    //   onClick: () => {
+    //     const input = document.createElement("input");
+    //     input.type = "file";
+    //     input.accept = "image/*";
+    //     input.onchange = async (event: Event) => {
+    //       const target = event.target as HTMLInputElement | null;
+    //       const file = target?.files?.[0];
+    //       if (!file) return;
 
-          const objectURL = URL.createObjectURL(file);
-          editor.chain().focus().setImage({ src: objectURL }).run();
-        };
-        input.click();
-      },
-      preesed: false,
-    },
+    //       const objectURL = URL.createObjectURL(file);
+    //       editor.chain().focus().setImage({ src: objectURL }).run();
+    //     };
+    //     input.click();
+    //   },
+    //   preesed: false,
+    // },
   ];
   return (
     <div className="flex gap-5 sticky top-0 bg-background z-500">

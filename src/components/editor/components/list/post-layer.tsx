@@ -23,6 +23,8 @@ export const PostLayer: React.FC = () => {
   const addBlog = useBlogStore((state) => state.addBlog);
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
 
+  const userId = localStorage.getItem("localUserId");
+
   /* FUNCTION TO DELETE A BLOG */
   const handleBlogDelete = async (blogLocalId: string) => {
     try {
@@ -38,14 +40,13 @@ export const PostLayer: React.FC = () => {
 
       const result = await res.json();
 
-      console.log(result);
-      if (res.ok) {
+      if (res.ok || result.error === "No blog found with that _localID") {
         deleteBlog(blogLocalId);
         setActiveTask(null);
         setActiveBlog(null);
         toast(`Blog has been deleted`);
       } else {
-        console.log("Blog not deleted");
+        toast("Blog not deleted");
       }
     } catch (error) {
       toast(`Error deleting blog: ${error}`);
@@ -55,7 +56,10 @@ export const PostLayer: React.FC = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredBlogs = blogs.filter((blog) =>
+  const userBlogs = blogs.filter((b) => b.creator === userId);
+  console.log("user blogs: ", userBlogs);
+
+  const filteredBlogs = userBlogs.filter((blog) =>
     blog.content.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 

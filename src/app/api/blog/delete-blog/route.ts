@@ -23,7 +23,7 @@ export async function DELETE(req: NextRequest) {
     if (!deletedBlog) {
       return NextResponse.json(
         { error: "No blog found with that _localID" },
-        { status: 404 }
+        { status: 200 }
       );
     }
 
