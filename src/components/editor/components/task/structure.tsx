@@ -70,7 +70,7 @@ export const Structure = () => {
     } else {
       setSavedBlog([]);
     }
-  }, [blog._localID, blog.content.body]);
+  }, [blog._localID]);
 
   const handleAddTags = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && inputValue.trim() !== "") {
