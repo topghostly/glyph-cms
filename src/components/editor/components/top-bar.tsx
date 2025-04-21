@@ -120,7 +120,7 @@ export const Topbar: React.FC = () => {
         },
         body: JSON.stringify({
           _localID: blog._localID,
-          content: JSON.stringify(blog),
+          content: JSON.stringify(updatedBlog),
           creator: localUserId,
         }),
       });

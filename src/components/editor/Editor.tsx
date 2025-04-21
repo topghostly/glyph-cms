@@ -36,6 +36,8 @@ export const Editor: React.FC<EditorInterface> = ({ session }) => {
     getAllBlogs();
   }, []);
 
+  useEffect(() => {});
+
   if (isScreenTooSmall) {
     return (
       <div className="grid place-content-center min-h-[100vh] min-w-[100vw] w-full h-full">

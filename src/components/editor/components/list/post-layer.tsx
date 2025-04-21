@@ -14,6 +14,8 @@ import Image from "next/image";
 import { toast } from "sonner";
 
 export const PostLayer: React.FC = () => {
+  const [loading, setLoading] = useState(false);
+
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
   const blogs = useBlogStore((state) => state.blogs);
   const deleteBlog = useBlogStore((state) => state.deleteBlog);
@@ -28,6 +30,7 @@ export const PostLayer: React.FC = () => {
   /* FUNCTION TO DELETE A BLOG */
   const handleBlogDelete = async (blogLocalId: string) => {
     try {
+      setLoading(true);
       const res = await fetch("/api/blog/delete-blog", {
         method: "DELETE",
         headers: {
@@ -50,6 +53,8 @@ export const PostLayer: React.FC = () => {
       }
     } catch (error) {
       toast(`Error deleting blog: ${error}`);
+    } finally {
+      setLoading(false);
     }
   };
   /* FUNCTION TO DELETE A BLOG */
@@ -116,15 +121,15 @@ export const PostLayer: React.FC = () => {
             )}
           >
             <div className="w-[40px] h-[40px] flex justify-center items-center relative">
-              <Image
-                className="rounded object-center object-cover"
+              <img
+                className="rounded object-center object-cover w-full h-full"
                 src={
                   d.content.mainImage?.url
                     ? d.content.mainImage?.url
                     : "/images/png/default-image.webp"
                 }
                 alt={"post image"}
-                fill
+                // fill
               />
             </div>
             <div className="flex flex-col">
@@ -134,28 +139,34 @@ export const PostLayer: React.FC = () => {
               <p className="text-[10px]">by Damilare Abolaji</p>
             </div>
             <div>
-              <DropdownMenu>
-                <DropdownMenuTrigger className="outline-none">
-                  <Ellipsis className="cursor-pointer" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        handleBlogDelete(d._localID);
-                      }}
-                    >
-                      <Trash2 />
-                      <span>Delete Blog</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <UserRoundPen />
-                      <span>Edit Blog</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <div className="w-3 h-3 border-1 border-white border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              ) : (
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="outline-none">
+                    <Ellipsis className="cursor-pointer" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleBlogDelete(d._localID);
+                        }}
+                      >
+                        <Trash2 />
+                        <span>Delete Blog</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <UserRoundPen />
+                        <span>Edit Blog</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </div>
         ))}
