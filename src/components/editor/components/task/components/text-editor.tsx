@@ -16,7 +16,6 @@ import { common, createLowlight } from "lowlight";
 import { Blog, Node } from "@/type/blog";
 import { useEffect } from "react";
 import { debounce } from "lodash";
-import { useBlogStore } from "@/store/blog-store";
 
 const lowlight = createLowlight(common);
 
@@ -29,7 +28,6 @@ export const TextEditor: React.FC<TextEditorProps> = ({
   setBlog,
   savedBlog,
 }) => {
-  const activeBlog = useBlogStore((state) => state.activeBlog);
   const handleUpdate = debounce((editor: Editor) => {
     const html = editor.getJSON();
 

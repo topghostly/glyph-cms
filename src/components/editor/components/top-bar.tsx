@@ -158,10 +158,6 @@ export const Topbar: React.FC = () => {
       const blogContent = JSON.parse(blog[0].content);
       setSyncMode(isEqual(blogContent.content, activeBlog?.content));
     }
-
-    const prevBlog = activeBlog._localID;
-    setActiveBlog(null);
-    setActiveBlog(prevBlog);
   }, [activeBlog, uploadTrigger]);
 
   return (

@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useBlogStore } from "@/store/blog-store";
 import { Blog, Node } from "@/type/blog";
-import Image from "next/image";
+// import Image from "next/image";
 
 export const Structure = () => {
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */

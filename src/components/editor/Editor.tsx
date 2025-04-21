@@ -11,7 +11,7 @@ import { Session } from "next-auth";
 import { useEffect, useState } from "react";
 import { MonitorCheck } from "lucide-react";
 import { getAllBlogs } from "@/util/getAllBlog";
-import Image from "next/image";
+// import Image from "next/image";
 
 export interface EditorInterface {
   session: Session;

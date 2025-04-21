@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useBlogStore } from "@/store/blog-store";
 import { Ellipsis, Plus, Search, Trash2, UserRoundPen } from "lucide-react";
-import Image from "next/image";
+// import Image from "next/image";
 import { toast } from "sonner";
 
 export const PostLayer: React.FC = () => {
