@@ -57,7 +57,6 @@ export const PostLayer: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const userBlogs = blogs.filter((b) => b.creator === userId);
-  console.log("user blogs: ", userBlogs);
 
   const filteredBlogs = userBlogs.filter((blog) =>
     blog.content.title.toLowerCase().includes(searchQuery.toLowerCase())

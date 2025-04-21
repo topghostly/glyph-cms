@@ -38,6 +38,7 @@ import { Blog } from "@/type/blog";
 import { toast } from "sonner";
 import isEqual from "lodash.isequal";
 import { getAllBlogs } from "@/util/getAllBlog";
+import { base64ToBlob } from "@/util/base64-blob";
 
 export const Topbar: React.FC = () => {
   const { session } = useAuth();
@@ -52,6 +53,7 @@ export const Topbar: React.FC = () => {
   const setActiveBlog = useBlogStore((state) => state.setActiveBlog);
   const activeTask = useBlogStore((state) => state.activeTask);
   const activeBlog = useBlogStore((state) => state.activeBlog);
+  const updateBlog = useBlogStore((state) => state.updateBlog);
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
 
   /* FUNCTION TO UPLOAD BLOG TO THE DATABASE */
@@ -61,36 +63,85 @@ export const Topbar: React.FC = () => {
       toast("User not authenticated yet. Please try again shortly.");
       return;
     }
+
+    if (!blog || !blog.content.mainImage?.url) {
+      toast("No blog or image found to upload.");
+      return;
+    }
+
     try {
       setUploading(true);
-      const res = await fetch("/api/blog/upload", {
+
+      // 1. Upload the image to S3
+      const formData = new FormData();
+      const imageBlob = base64ToBlob(blog.content.mainImage.url);
+      formData.append("file", imageBlob, `${blog._localID}-main.jpg`);
+
+      const imageUploadRes = await fetch("/api/bucket/image-upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!imageUploadRes.ok) {
+        toast("Image upload failed.");
+        return;
+      }
+
+      const { data } = await imageUploadRes.json();
+      console.log("the publicUrl: ", data.publicUrl);
+
+      // 2. Replace base64 with final public S3 URL
+      updateBlog({
+        ...blog,
+        content: {
+          ...blog.content,
+          mainImage: {
+            ...blog.content.mainImage,
+            url: data.publicUrl,
+          },
+        },
+      });
+      const updatedBlog = {
+        ...blog,
+        content: {
+          ...blog.content,
+          mainImage: {
+            ...blog.content.mainImage,
+            url: data.publicUrl,
+          },
+        },
+      };
+
+      // 3. Upload blog to DB
+      const blogUploadRes = await fetch("/api/blog/upload", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          _localID: blog?._localID,
+          _localID: blog._localID,
           content: JSON.stringify(blog),
-          creator: localUserId || "Unknown",
+          creator: localUserId,
         }),
       });
 
-      const result = await res.json();
+      const result = await blogUploadRes.json();
       console.log(result);
       await getAllBlogs();
 
-      if (res.ok) {
-        toast(`'${blog?.content.title}' has been uploaded`);
+      if (blogUploadRes.ok) {
+        toast(`'${updatedBlog.content.title}' has been uploaded`);
         setUploadTrigger((prev) => !prev);
       } else {
-        console.log("Blog not uploaded ");
+        toast("Blog upload failed.");
       }
     } catch (error) {
-      toast(`ERROR: ${error}`);
+      toast(`ERROR: ${String(error)}`);
     } finally {
       setUploading(false);
     }
   };
+
   /* FUNCTION TO UPLOAD BLOG TO THE DATABASE */
 
   useEffect(() => {
@@ -107,6 +158,10 @@ export const Topbar: React.FC = () => {
       const blogContent = JSON.parse(blog[0].content);
       setSyncMode(isEqual(blogContent.content, activeBlog?.content));
     }
+
+    const prevBlog = activeBlog._localID;
+    setActiveBlog(null);
+    setActiveBlog(prevBlog);
   }, [activeBlog, uploadTrigger]);
 
   return (

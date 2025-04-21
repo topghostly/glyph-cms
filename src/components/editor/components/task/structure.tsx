@@ -164,11 +164,11 @@ export const Structure = () => {
           <CardContent className="flex flex-col gap-5 px-0">
             {blog.content.mainImage?.url ? (
               <div className="w-full relative h-100">
-                <Image
+                <img
                   src={blog.content.mainImage.url}
                   alt="new image"
-                  className="mx-auto rounded object-center object-cover"
-                  fill
+                  className="mx-auto rounded object-center object-cover w-full h-full"
+                  // fill
                 />
               </div>
             ) : (
