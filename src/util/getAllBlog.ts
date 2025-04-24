@@ -20,6 +20,7 @@ export const getAllBlogs = async () => {
     });
 
     const result = await res.json();
+    console.log("The result is ", result);
 
     if (res.ok) {
       localStorage.setItem("online-blogs", JSON.stringify(result.blogs));

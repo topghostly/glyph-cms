@@ -72,23 +72,30 @@ export const Topbar: React.FC = () => {
     try {
       setUploading(true);
 
+      if (!activeBlog || !activeBlog.content.mainImage) return;
+      let finalImageUrl = activeBlog.content.mainImage.url;
+
+      const imageBlob = base64ToBlob(finalImageUrl!);
+
       // 1. Upload the image to S3
-      const formData = new FormData();
-      const imageBlob = base64ToBlob(blog.content.mainImage.url);
-      formData.append("file", imageBlob, `${blog._localID}-main.jpg`);
+      if (imageBlob instanceof Blob) {
+        const formData = new FormData();
+        formData.append("file", imageBlob, `${activeBlog._localID}-main.jpg`);
 
-      const imageUploadRes = await fetch("/api/bucket/image-upload", {
-        method: "POST",
-        body: formData,
-      });
+        const imageUploadRes = await fetch("/api/bucket/image-upload", {
+          method: "POST",
+          body: formData,
+        });
 
-      if (!imageUploadRes.ok) {
-        toast("Image upload failed.");
-        return;
+        if (!imageUploadRes.ok) {
+          toast("Image upload failed.");
+          return;
+        }
+
+        const { data } = await imageUploadRes.json();
+        console.log("✅ Uploaded image URL:", data.publicUrl);
+        finalImageUrl = data.publicUrl;
       }
-
-      const { data } = await imageUploadRes.json();
-      console.log("the publicUrl: ", data.publicUrl);
 
       // 2. Replace base64 with final public S3 URL
       updateBlog({
@@ -97,7 +104,7 @@ export const Topbar: React.FC = () => {
           ...blog.content,
           mainImage: {
             ...blog.content.mainImage,
-            url: data.publicUrl,
+            url: finalImageUrl,
           },
         },
       });
@@ -107,7 +114,7 @@ export const Topbar: React.FC = () => {
           ...blog.content,
           mainImage: {
             ...blog.content.mainImage,
-            url: data.publicUrl,
+            url: finalImageUrl,
           },
         },
       };
@@ -130,17 +137,100 @@ export const Topbar: React.FC = () => {
       await getAllBlogs();
 
       if (blogUploadRes.ok) {
-        toast(`'${updatedBlog.content.title}' has been uploaded`);
+        toast(`✅ '${updatedBlog.content.title}' has been uploaded`);
         setUploadTrigger((prev) => !prev);
       } else {
         toast("Blog upload failed.");
       }
     } catch (error) {
-      toast(`ERROR: ${String(error)}`);
+      toast(`UPLOAD ERROR: ${String(error)}`);
     } finally {
       setUploading(false);
     }
   };
+  // const handleBlogUpload = async (blog: Blog | null) => {
+  //   const localUserId = localStorage.getItem("localUserId");
+  //   if (!localUserId) {
+  //     toast("User not authenticated yet. Please try again shortly.");
+  //     return;
+  //   }
+
+  //   if (!blog || !blog.content.mainImage?.url) {
+  //     toast("No blog or image found to upload.");
+  //     return;
+  //   }
+
+  //   try {
+  //     setUploading(true);
+  //     // 1. Upload the image to S3
+  //     const formData = new FormData();
+  //     const imageBlob = base64ToBlob(blog.content.mainImage.url);
+  //     formData.append("file", imageBlob, `${blog._localID}-main.jpg`);
+
+  //     const imageUploadRes = await fetch("/api/bucket/image-upload", {
+  //       method: "POST",
+  //       body: formData,
+  //     });
+
+  //     if (!imageUploadRes.ok) {
+  //       toast("Image upload failed.");
+  //       return;
+  //     }
+
+  //     const { data } = await imageUploadRes.json();
+  //     console.log("the publicUrl: ", data.publicUrl);
+
+  //     // 2. Replace base64 with final public S3 URL
+  //     updateBlog({
+  //       ...blog,
+  //       content: {
+  //         ...blog.content,
+  //         mainImage: {
+  //           ...blog.content.mainImage,
+  //           url: data.publicUrl,
+  //         },
+  //       },
+  //     });
+  //     const updatedBlog = {
+  //       ...blog,
+  //       content: {
+  //         ...blog.content,
+  //         mainImage: {
+  //           ...blog.content.mainImage,
+  //           url: data.publicUrl,
+  //         },
+  //       },
+  //     };
+
+  //     // 3. Upload blog to DB
+  //     const blogUploadRes = await fetch("/api/blog/upload", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         _localID: blog._localID,
+  //         content: JSON.stringify(updatedBlog),
+  //         creator: localUserId,
+  //       }),
+  //     });
+
+  //     const result = await blogUploadRes.json();
+  //     console.log(result);
+  //     await getAllBlogs();
+
+  //     if (blogUploadRes.ok) {
+  //       toast(`'${updatedBlog.content.title}' has been uploaded`);
+  //       setUploadTrigger((prev) => !prev);
+  //     } else {
+  //       toast("Blog upload failed.");
+  //     }
+  //   } catch (error) {
+  //     toast(`UPLOAD ERROR: ${String(error)}`);
+  //   } finally {
+  //     setUploading(false);
+  //   }
+  // };
 
   /* FUNCTION TO UPLOAD BLOG TO THE DATABASE */
 
@@ -248,27 +338,38 @@ export const Topbar: React.FC = () => {
           <FileJson size={16} /> JSON
         </Button>
       </div>
-      <div className="h-full flex gap-3 justify-center items-center">
-        <div
-          className={cn(
-            "p-2 rounded-full border-[2px] cursor-pointer duration-150",
-            syncMode
-              ? "border-green-950 text-green-300 hover:bg-green-950"
-              : "border-amber-950 text-amber-300 hover:bg-amber-950",
-            !activeBlog && "text-white/80 border-white/5 hover:bg-white/10"
-          )}
+      <div className="h-full flex gap-5 justify-center items-center">
+        {}
+        <div>
+          <p className="text-[13px] text-white/30">
+            Blog status{" "}
+            <span
+              className={cn(
+                "w-1.5 h-1.5 rounded-full inline-block ml-1",
+                syncMode
+                  ? " bg-green-500 hover:bg-green-950"
+                  : " bg-amber-500 hover:bg-amber-950",
+                !activeBlog && "bg-white/80 border-white/5 hover:bg-white/10"
+              )}
+            />
+          </p>
+        </div>
+        <Button
+          variant={"outline"}
+          size={"sm"}
           onClick={() => {
             if (!syncMode && activeBlog) handleBlogUpload(activeBlog);
           }}
         >
           {uploading ? (
             <div className="flex items-center justify-center">
-              <div className="w-[15px] h-[15px] border-1 border-amber-300 border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-[15px] h-[15px] border-1 border-white/80 border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : (
-            <ArrowUpToLine size={15} strokeWidth={3} />
+            <ArrowUpToLine size={12} strokeWidth={2} />
           )}
-        </div>
+        </Button>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <div className="flex justify-center items-center w-[30px] h-[30px] relative cursor-pointer rounded-full overflow-hidden">

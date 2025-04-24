@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function CreatorBoard() {
   return (
-    <div className="w-full h-fit p-5 bg-white border-1 border-gray-200">
+    <div className="w-full h-fit p-5 bg-white border-1 rounded-md border-gray-200">
       <p className="text-[#334155] text-xl font-bold mb-2">Written by</p>
       <div className="flex gap-2">
         <Image

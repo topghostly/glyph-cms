@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     );
   } catch (e) {
     console.error(e);
-    toast("Failed to upload blog");
+    // toast("Failed to upload blog");
     return NextResponse.json(
       { error: "Failed to create blog" },
       { status: 500 }

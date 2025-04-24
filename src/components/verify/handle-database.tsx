@@ -11,6 +11,7 @@ export default function HandleDatabase({ session }: { session: Session }) {
 
   const addMailToDB = useCallback(
     async (data: User) => {
+      localStorage.setItem("glyph-username", data.fullname);
       try {
         const res = await fetch("/api/user", {
           method: "POST",

@@ -136,7 +136,9 @@ export const PostLayer: React.FC = () => {
               <p className="text-[14px] font-bold truncate w-[170px]">
                 {d.content.title !== "" ? d.content.title : "Untitled Blog"}
               </p>
-              <p className="text-[10px]">by Damilare Abolaji</p>
+              <p className="text-[10px]">
+                {localStorage.getItem("glyph-username")}
+              </p>
             </div>
             <div>
               {loading ? (
