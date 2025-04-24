@@ -14,7 +14,7 @@ import { Ellipsis, Plus, Search, Trash2, UserRoundPen } from "lucide-react";
 import { toast } from "sonner";
 
 export const PostLayer: React.FC = () => {
-  const [loading, setLoading] = useState(false);
+  const [deletingBlogId, setDeletingBlogId] = useState<string | null>(null);
 
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
   const blogs = useBlogStore((state) => state.blogs);
@@ -29,8 +29,8 @@ export const PostLayer: React.FC = () => {
 
   /* FUNCTION TO DELETE A BLOG */
   const handleBlogDelete = async (blogLocalId: string) => {
+    setDeletingBlogId(blogLocalId);
     try {
-      setLoading(true);
       const res = await fetch("/api/blog/delete-blog", {
         method: "DELETE",
         headers: {
@@ -54,7 +54,7 @@ export const PostLayer: React.FC = () => {
     } catch (error) {
       toast(`Error deleting blog: ${error}`);
     } finally {
-      setLoading(false);
+      setDeletingBlogId(null);
     }
   };
   /* FUNCTION TO DELETE A BLOG */
@@ -141,7 +141,7 @@ export const PostLayer: React.FC = () => {
               </p>
             </div>
             <div>
-              {loading ? (
+              {deletingBlogId === d._localID ? (
                 <div className="flex items-center justify-center">
                   <div className="w-3 h-3 border-1 border-white border-t-transparent rounded-full animate-spin"></div>
                 </div>
