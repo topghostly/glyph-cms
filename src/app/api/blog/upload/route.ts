@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectToDB from "@/lib/mongodb";
 import Blog from "@/models/blog";
-import { toast } from "sonner";
 
 export async function POST(req: NextRequest) {
   try {
@@ -43,7 +42,6 @@ export async function POST(req: NextRequest) {
     );
   } catch (e) {
     console.error(e);
-    // toast("Failed to upload blog");
     return NextResponse.json(
       { error: "Failed to create blog" },
       { status: 500 }
