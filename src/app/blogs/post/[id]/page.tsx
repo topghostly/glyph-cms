@@ -33,9 +33,7 @@ export default function PreviewPage() {
       const result = await res.json();
 
       if (res.ok || result.error === "No blog found with that _localID") {
-        console.log(result);
         const content = JSON.parse(result.blog.content);
-        console.log(result.creator.fullname);
         setcontent(content.content);
         setCreator(result.creator);
       } else {
