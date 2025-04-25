@@ -1,10 +1,7 @@
 export function base64ToBlob(base64: string): Blob | string {
   if (base64.startsWith(`https`)) {
-    console.log("URL detected, skipping blob conversion.");
     return base64; // ✅ now type-safe
   }
-
-  console.log("Blob detected, blob conversion.", base64);
 
   const [metadata, data] = base64.split(",");
   const mimeMatch = metadata.match(/:(.*?);/);
