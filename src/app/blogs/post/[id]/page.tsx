@@ -41,6 +41,7 @@ export default function PreviewPage() {
       }
     } catch (error) {
       setError(true);
+      console.log(error);
     } finally {
       setLoading(false);
     }
