@@ -41,6 +41,21 @@ export type Blog = {
   creator: string;
 };
 
+export type BlogContentProp = {
+  title: string;
+  tags?: string[];
+  mainImage?: {
+    url?: string;
+    alt?: string;
+  };
+  mainImageBlobUrl?: string;
+  body?: {
+    content: Node[];
+  };
+  conclusion?: Node[];
+  links?: string[];
+};
+
 export type BlogState = {
   blogs: Blog[];
   addBlog: (blog: Blog) => void;

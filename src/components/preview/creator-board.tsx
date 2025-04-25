@@ -1,7 +1,18 @@
 // import { useAuth } from "@/store/auth-store";
 import Image from "next/image";
+import { useEffect } from "react";
 
-export default function CreatorBoard() {
+export default function CreatorBoard({
+  email,
+  fullname,
+}: {
+  email?: string;
+  fullname?: string;
+}) {
+  useEffect(() => {
+    console.log("email", email);
+    console.log("fullname", fullname);
+  });
   // const { session } = useAuth();
   return (
     <div className="w-full h-fit p-5 bg-white border-1 rounded-md border-gray-200">
@@ -17,10 +28,12 @@ export default function CreatorBoard() {
         />
         <div>
           <p className="text-lg text-[14px] font-bold truncate w-[130px]">
-            {localStorage.getItem("glyph-username")}
+            {fullname ?? localStorage.getItem("glyph-username")}
           </p>
           <p className="text-xs">
-            @{localStorage.getItem("glyph-username")!.replace(/\s+/g, "")}
+            @
+            {fullname!.replace(/\s+/g, "") ??
+              localStorage.getItem("glyph-username")!.replace(/\s+/g, "")}
           </p>
         </div>
       </div>
