@@ -1,19 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectToDB from "@/lib/mongodb";
 import Blog from "@/models/blog";
+import User from "@/models/user";
 
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await req.json();
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "User ID is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid UserID" }, { status: 400 });
     }
 
     await connectToDB();
+
+    const validUser = await User.findById(userId);
+
+    if (!validUser) {
+      return NextResponse.json({ mssg: "User not found" }, { status: 404 });
+    }
 
     const blogs = await Blog.find({ creator: userId });
 
