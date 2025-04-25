@@ -3,6 +3,7 @@
 import { renderNode } from "@/components/editor/components/task/preview-blog";
 import AdvertBoard from "@/components/preview/advert-board";
 import CreatorBoard from "@/components/preview/creator-board";
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
@@ -17,16 +18,26 @@ export default function PreviewPage() {
     <>
       {/*  NAVBAR */}
       <nav className="w-full z-[100] px-5 h-[70px] fixed top-0 backdrop-blur-sm bg-white/70 border-b-2 border-b-gray-200">
-        <div className="flex gap-1 items-center w-full max-w-[1400px] mx-auto h-full">
-          <Image
-            src={"/images/svg/Glyph-01.svg"}
-            alt="glyph logo"
-            width={35}
-            height={35}
-          />
-          <p className="text-2xl font-bold text-gray-500">
-            Glyph <span className="font-medium text-sm">(beta)</span>
-          </p>
+        <div className="flex gap-1 items-center justify-between w-full max-w-[1400px] mx-auto h-full">
+          <div className="flex gap-1 items-end">
+            <Image
+              src={"/images/svg/Glyph-black.svg"}
+              alt="glyph logo"
+              width={35}
+              height={35}
+            />
+            <p className="text-[1.5rem] font-bold text-black">
+              Glyph
+              {/* <span className="font-medium text-sm">(beta)</span> */}
+            </p>
+          </div>
+          {/* SIGNUP BUTTON */}
+          <Button
+            variant={"default"}
+            className="hover:bg-gray-200 border border-gray-200"
+          >
+            Sign Up
+          </Button>
         </div>
       </nav>
       {/*  NAVBAR */}
@@ -55,18 +66,20 @@ export default function PreviewPage() {
                   )}
                 </div>
 
-                {(content?.tags ?? []).length > 0 && (
-                  <div className="mb-4 flex flex-wrap gap-2">
-                    {(content?.tags ?? []).map((tag, index) => (
-                      <span
-                        key={index}
-                        className="bg-gray-200 text-gray-800 px-2 py-0.5 rounded-full text-[10px]"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
+                {/* <div className="padding-x">
+                  {(content?.tags ?? []).length > 0 && (
+                    <div className="mb-4 flex flex-wrap gap-2">
+                      {(content?.tags ?? []).map((tag, index) => (
+                        <span
+                          key={index}
+                          className="bg-gray-200 text-gray-800 px-2 py-0.5 rounded-full text-[10px]"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div> */}
 
                 <div className="padding-x leading-loose">
                   {content?.body?.content.map((node, index) =>
