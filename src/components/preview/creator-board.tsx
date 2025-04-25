@@ -1,3 +1,5 @@
+"use client";
+
 // import { useAuth } from "@/store/auth-store";
 import Image from "next/image";
 import { useEffect } from "react";
@@ -28,12 +30,11 @@ export default function CreatorBoard({
         />
         <div>
           <p className="text-lg text-[14px] font-bold truncate w-[130px]">
-            {fullname ?? localStorage.getItem("glyph-username")}
+            {/* {localStorage.getItem("glyph-username")} */}Tope
           </p>
           <p className="text-xs">
-            @
-            {fullname!.replace(/\s+/g, "") ??
-              localStorage.getItem("glyph-username")!.replace(/\s+/g, "")}
+            {/* @{localStorage.getItem("glyph-username")!.replace(/\s+/g, "")} */}
+            tope
           </p>
         </div>
       </div>
