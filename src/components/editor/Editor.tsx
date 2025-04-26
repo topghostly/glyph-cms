@@ -11,6 +11,7 @@ import { Session } from "next-auth";
 import { useEffect, useState } from "react";
 import { MonitorCheck } from "lucide-react";
 import { getAllBlogs } from "@/util/getAllBlog";
+import { useUser } from "@/store/user-store";
 // import Image from "next/image";
 
 export interface EditorInterface {
@@ -19,6 +20,7 @@ export interface EditorInterface {
 
 export const Editor: React.FC<EditorInterface> = ({ session }) => {
   const [isScreenTooSmall, setIsScreenTooSmall] = useState(true);
+  const { userInfo } = useUser(); // UserId from user context
   // const [loading, setLoading] = useState<boolean>();
 
   useEffect(() => {
@@ -33,7 +35,7 @@ export const Editor: React.FC<EditorInterface> = ({ session }) => {
   }, []);
 
   useEffect(() => {
-    getAllBlogs();
+    getAllBlogs(userInfo.userId);
   }, []);
 
   useEffect(() => {});

@@ -4,6 +4,7 @@ import localFont from "next/font/local";
 import { Toaster } from "@/components/ui/sonner";
 
 import "./globals.css";
+import { UserProvider } from "@/store/user-store";
 
 export const metadata: Metadata = {
   title: "Glyph • A new way to write",
@@ -36,7 +37,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${satoshi.className} antialiased`}>
-        {children}
+        <UserProvider>{children}</UserProvider>
         <Toaster />
       </body>
     </html>

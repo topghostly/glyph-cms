@@ -1,11 +1,10 @@
 import { toast } from "sonner";
 
-export const getAllBlogs = async () => {
+export const getAllBlogs = async (userId: string) => {
   console.log("Started fetching");
-  const userId = localStorage.getItem("localUserId");
 
   if (!userId) {
-    console.warn("No userId found in localStorage");
+    console.warn("No userId found in userInfo. Cannot fetch blogs.");
     //   setLoading(false);
     return;
   }
@@ -20,7 +19,7 @@ export const getAllBlogs = async () => {
     });
 
     const result = await res.json();
-    console.log("The result is ", result);
+    console.log("The result is from get all blogs", result);
 
     if (res.ok) {
       localStorage.setItem("online-blogs", JSON.stringify(result.blogs));

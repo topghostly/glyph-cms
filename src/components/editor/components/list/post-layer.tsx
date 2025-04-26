@@ -12,6 +12,7 @@ import { useBlogStore } from "@/store/blog-store";
 import { Ellipsis, Plus, Search, Trash2, UserRoundPen } from "lucide-react";
 // import Image from "next/image";
 import { toast } from "sonner";
+import { useUser } from "@/store/user-store";
 
 export const PostLayer: React.FC = () => {
   const [deletingBlogId, setDeletingBlogId] = useState<string | null>(null);
@@ -25,7 +26,7 @@ export const PostLayer: React.FC = () => {
   const addBlog = useBlogStore((state) => state.addBlog);
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
 
-  const userId = localStorage.getItem("localUserId");
+  const { userInfo } = useUser(); // UserId from user context
 
   /* FUNCTION TO DELETE A BLOG */
   const handleBlogDelete = async (blogLocalId: string) => {
@@ -47,12 +48,12 @@ export const PostLayer: React.FC = () => {
         deleteBlog(blogLocalId);
         setActiveTask(null);
         setActiveBlog(null);
-        toast(`Blog has been deleted`);
+        toast(`✅ Blog has been deleted`);
       } else {
-        toast("Blog not deleted");
+        toast("❌ Blog not deleted");
       }
     } catch (error) {
-      toast(`Error deleting blog: ${error}`);
+      toast(`❌ Error deleting blog: ${error}`);
     } finally {
       setDeletingBlogId(null);
     }
@@ -61,7 +62,7 @@ export const PostLayer: React.FC = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  const userBlogs = blogs.filter((b) => b.creator === userId);
+  const userBlogs = blogs.filter((b) => b.creator === userInfo.userId);
 
   const filteredBlogs = userBlogs.filter((blog) =>
     blog.content.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -79,8 +80,9 @@ export const PostLayer: React.FC = () => {
               _localID: newBlogID,
               content: {
                 title: "Untitled Blog",
+                description: "",
               },
-              creator: localStorage.getItem("localUserId") ?? "Unknown",
+              creator: userInfo.userId ?? "Unknown",
             });
             setActiveBlog(newBlogID);
             setActiveTask("structure");
@@ -136,9 +138,7 @@ export const PostLayer: React.FC = () => {
               <p className="text-[14px] font-bold truncate w-[170px]">
                 {d.content.title !== "" ? d.content.title : "Untitled Blog"}
               </p>
-              <p className="text-[10px]">
-                {localStorage.getItem("glyph-username")}
-              </p>
+              <p className="text-[10px]">{userInfo.username}</p>
             </div>
             <div>
               {deletingBlogId === d._localID ? (

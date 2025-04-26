@@ -28,6 +28,7 @@ export type Blog = {
   _localID: string;
   content: {
     title: string;
+    description: string;
     tags?: string[];
     mainImage?: {
       url?: string;

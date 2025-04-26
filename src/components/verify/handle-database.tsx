@@ -5,13 +5,15 @@ import { Session } from "next-auth";
 import { useRouter } from "next/navigation";
 import { User } from "@/type/user";
 import { toast } from "sonner";
+import { useUser } from "@/store/user-store";
 
 export default function HandleDatabase({ session }: { session: Session }) {
   const router = useRouter();
+  const { updateUserInfo } = useUser();
 
   const addMailToDB = useCallback(
     async (data: User) => {
-      localStorage.setItem("glyph-username", data.fullname);
+      console.log("Adding user to DB:", data);
       try {
         const res = await fetch("/api/user", {
           method: "POST",
@@ -25,8 +27,13 @@ export default function HandleDatabase({ session }: { session: Session }) {
 
         if (res.ok && result.user?._id) {
           console.log("✅ Received user ID from backend:", result.user._id);
-          localStorage.setItem("localUserId", result.user._id);
-          toast(`Welcome, ${data.fullname}`);
+          updateUserInfo({
+            username: data.fullname,
+            usermail: data.email,
+            userImage: data.image,
+            userId: result.user._id,
+          });
+          toast(`✅ Welcome, ${data.fullname}`);
           router.replace("/");
         } else {
           toast(`❌ An error occurred, please try again.`);
@@ -43,10 +50,11 @@ export default function HandleDatabase({ session }: { session: Session }) {
   );
 
   useEffect(() => {
-    if (session?.user?.email && session.user.name) {
+    if (session?.user?.email && session.user.name && session.user.image) {
       const data: User = {
         email: session.user.email,
         fullname: session.user.name,
+        image: session.user.image,
       };
 
       addMailToDB(data);

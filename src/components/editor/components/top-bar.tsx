@@ -39,6 +39,8 @@ import { toast } from "sonner";
 import isEqual from "lodash.isequal";
 import { getAllBlogs } from "@/util/getAllBlog";
 import { base64ToBlob } from "@/util/base64-blob";
+import { LocalUserInfoProps } from "@/type/user";
+import { useUser } from "@/store/user-store";
 
 export const Topbar: React.FC = () => {
   const { session } = useAuth();
@@ -46,6 +48,7 @@ export const Topbar: React.FC = () => {
   const [syncMode, setSyncMode] = useState<boolean>(false);
   const [uploadTrigger, setUploadTrigger] = useState(false);
   const [uploading, setUploading] = useState<boolean>(false);
+  // const [userInfo, setUserInfo] = useState<LocalUserInfoProps>();
 
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
   const addBlog = useBlogStore((state) => state.addBlog);
@@ -55,12 +58,13 @@ export const Topbar: React.FC = () => {
   const activeBlog = useBlogStore((state) => state.activeBlog);
   const updateBlog = useBlogStore((state) => state.updateBlog);
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
+  const { userInfo } = useUser();
 
   /* FUNCTION TO UPLOAD BLOG TO THE DATABASE */
   const handleBlogUpload = async (blog: Blog | null) => {
-    const localUserId = localStorage.getItem("localUserId");
-    if (!localUserId) {
-      toast("User not authenticated yet. Please try again shortly.");
+    // GET USER INFORMATION FROM LOCALSTORAGE
+    if (!userInfo.userId) {
+      toast("❌ Error: You may not authenticated yet. Please reload the app.");
       return;
     }
 
@@ -88,7 +92,7 @@ export const Topbar: React.FC = () => {
         });
 
         if (!imageUploadRes.ok) {
-          toast("Image upload failed.");
+          toast("❌ Image upload failed.");
           return;
         }
 
@@ -128,22 +132,23 @@ export const Topbar: React.FC = () => {
         body: JSON.stringify({
           _localID: blog._localID,
           content: JSON.stringify(updatedBlog),
-          creator: localUserId,
+          creator: userInfo.userId,
+          link: `https://glyph-cms.vercel.app/blogs/post/${blog._localID}`,
         }),
       });
 
       const result = await blogUploadRes.json();
       console.log(result);
-      await getAllBlogs();
+      await getAllBlogs(userInfo.userId);
 
       if (blogUploadRes.ok) {
         toast(`✅ '${updatedBlog.content.title}' has been uploaded`);
         setUploadTrigger((prev) => !prev);
       } else {
-        toast("Blog upload failed.");
+        toast("❌ Blog upload failed.");
       }
     } catch (error) {
-      toast(`UPLOAD ERROR: ${String(error)}`);
+      toast(`❌ UPLOAD ERROR: ${String(error)}`);
     } finally {
       setUploading(false);
     }
@@ -185,8 +190,9 @@ export const Topbar: React.FC = () => {
               _localID: newBlogID,
               content: {
                 title: "Untitled Blog",
+                description: "",
               },
-              creator: localStorage.getItem("localUserId") ?? "Unknown",
+              creator: userInfo?.userId ?? "Unknown",
             });
             setActiveBlog(newBlogID);
             setActiveTask("structure");
@@ -256,7 +262,6 @@ export const Topbar: React.FC = () => {
         </Button>
       </div>
       <div className="h-full flex gap-5 justify-center items-center">
-        {}
         <div>
           <p className="text-[13px] text-white/30">
             Blog status{" "}
@@ -271,9 +276,11 @@ export const Topbar: React.FC = () => {
             />
           </p>
         </div>
+
         <Button
           variant={"outline"}
           size={"sm"}
+          className="w-8 h-8"
           onClick={() => {
             if (!syncMode && activeBlog) handleBlogUpload(activeBlog);
           }}
@@ -320,19 +327,19 @@ export const Topbar: React.FC = () => {
                     <DropdownMenuItem
                       onClick={async () => {
                         try {
-                          if (!localStorage.getItem("localUserId")) return;
+                          if (!userInfo?.userId) return;
                           await navigator.clipboard.writeText(
-                            localStorage.getItem("localUserId")!
+                            userInfo?.userId!
                           );
-                          toast("Access key copied");
+                          toast("✅ Access key copied");
                         } catch (error) {
-                          toast("Unable to copy access key");
+                          toast("❌ Unable to copy access key");
                           console.log(error);
                         }
                       }}
                     >
                       <KeySquare size={15} />
-                      <span>{localStorage.getItem("localUserId")}</span>
+                      <span>{userInfo?.userId}</span>
                     </DropdownMenuItem>
                   </DropdownMenuSubContent>
                 </DropdownMenuPortal>

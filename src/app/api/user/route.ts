@@ -4,12 +4,12 @@ import User from "@/models/user";
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, fullname } = await req.json();
+    const { email, fullname, image } = await req.json();
 
     // Validate input data
-    if (!email || !fullname) {
+    if (!email || !fullname || !image) {
       return NextResponse.json(
-        { error: "Name and email are required" },
+        { error: "Name, email, and image are required" },
         { status: 400 }
       );
     }
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Otherwise create new user
-    const newUser = new User({ email, fullname });
+    const newUser = new User({ email, fullname, image });
     await newUser.save();
 
     return NextResponse.json(

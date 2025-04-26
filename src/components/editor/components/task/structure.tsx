@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useBlogStore } from "@/store/blog-store";
 import { Blog, Node } from "@/type/blog";
-// import Image from "next/image";
+import { useUser } from "@/store/user-store";
 
 export const Structure = () => {
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
@@ -25,7 +25,7 @@ export const Structure = () => {
   const activeBlog = useBlogStore((state) => state.activeBlog);
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
 
-  // const scrollableRef = useRef(null);
+  const { userInfo } = useUser(); // UserId from user context
 
   const [inputValue, setInputValue] = useState<string>("");
   const [savedBlog, setSavedBlog] = useState<Node[]>([]);
@@ -34,13 +34,14 @@ export const Structure = () => {
       _localID: "",
       content: {
         title: "",
+        description: "",
         tags: [],
         mainImage: {
           alt: "",
           url: "",
         },
       },
-      creator: localStorage.getItem("localUserId") ?? "Unknown",
+      creator: userInfo.userId ?? "Unknown",
     }
   );
 
@@ -274,6 +275,25 @@ export const Structure = () => {
             </Button>
           </div>
         </div>
+      </div>
+
+      {/* DESCRIPTION */}
+      <div className="flex flex-col gap-4">
+        <Label htmlFor="title" className="text-[12px]">
+          Blog Description
+        </Label>
+        <Input
+          id="title"
+          name="title"
+          placeholder="Beware that, when fighting monsters, you yourself do not become a monster... for when you gaze long into the abyss. The abyss gazes also into you."
+          value={blog.content.description}
+          onChange={(e) =>
+            setBlog({
+              ...blog,
+              content: { ...blog.content, description: e.target.value },
+            })
+          }
+        />
       </div>
 
       {/* BODY */}

@@ -4,10 +4,10 @@ import Blog from "@/models/blog";
 
 export async function POST(req: NextRequest) {
   try {
-    const { _localID, content, creator } = await req.json();
+    const { _localID, content, creator, link } = await req.json();
 
     // Validate input data
-    if (!_localID || !content || !creator) {
+    if (!_localID || !content || !creator || !link) {
       return NextResponse.json(
         { error: "A LocalId, content, and creator are required" },
         { status: 400 }
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
     // Otherwise create new user
     console.log("Creating new blog");
-    const newBlog = new Blog({ _localID, content, creator });
+    const newBlog = new Blog({ _localID, content, creator, link });
     await newBlog.save();
 
     return NextResponse.json(
