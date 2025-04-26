@@ -39,7 +39,6 @@ import { toast } from "sonner";
 import isEqual from "lodash.isequal";
 import { getAllBlogs } from "@/util/getAllBlog";
 import { base64ToBlob } from "@/util/base64-blob";
-import { LocalUserInfoProps } from "@/type/user";
 import { useUser } from "@/store/user-store";
 
 export const Topbar: React.FC = () => {
