@@ -327,9 +327,9 @@ export const Topbar: React.FC = () => {
                       onClick={async () => {
                         try {
                           if (!userInfo?.userId) return;
-                          await navigator.clipboard.writeText(
-                            userInfo?.userId!
-                          );
+
+                          await navigator.clipboard.writeText(userInfo.userId); // <-- remove the !
+
                           toast("✅ Access key copied");
                         } catch (error) {
                           toast("❌ Unable to copy access key");
