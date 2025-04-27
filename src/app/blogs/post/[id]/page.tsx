@@ -141,8 +141,8 @@ export default function PreviewPage() {
             <aside className="w-[290px] sticky top-[90px] h-fit md:flex flex-col gap-5 hidden">
               <AdvertBoard />
               <CreatorBoard
-                email={creator!.email}
                 fullname={creator!.fullname}
+                image={creator!.image}
               />
             </aside>
           </div>

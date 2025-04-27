@@ -2,7 +2,7 @@
 
 import { renderNode } from "@/components/editor/components/task/preview-blog";
 import AdvertBoard from "@/components/preview/advert-board";
-import CreatorBoard from "@/components/preview/creator-board";
+// import CreatorBoard from "@/components/preview/creator-board";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -91,7 +91,7 @@ export default function PreviewPage() {
           </main>
           <aside className="w-[290px] sticky top-[90px] h-fit md:flex flex-col gap-5 hidden">
             <AdvertBoard />
-            <CreatorBoard />
+            {/* <CreatorBoard /> */}
           </aside>
         </div>
       </div>

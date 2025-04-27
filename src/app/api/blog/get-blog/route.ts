@@ -35,6 +35,7 @@ export async function POST(req: NextRequest) {
           _id: creator._id,
           email: creator.email,
           fullname: creator.fullname,
+          image: creator.image,
         },
       },
       { status: 200 }
