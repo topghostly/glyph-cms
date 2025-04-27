@@ -1,6 +1,8 @@
 "use client";
 
 import { renderNode } from "@/components/editor/components/task/preview-blog";
+import ErrorPage from "@/components/external-post/error";
+import Loader from "@/components/external-post/loader";
 import AdvertBoard from "@/components/preview/advert-board";
 import CreatorBoard from "@/components/preview/creator-board";
 import { Button } from "@/components/ui/button";
@@ -53,19 +55,11 @@ export default function PreviewPage() {
   }, []);
 
   if (error) {
-    return (
-      <div className="w-full h-screen flex items-center justify-center">
-        <p className="text-center text-2xl">ERROR</p>
-      </div>
-    );
+    return <ErrorPage />;
   }
 
   if (loading && !error && !content) {
-    return (
-      <div className="w-full h-screen flex items-center justify-center">
-        <p className="text-center text-2xl">LOADING</p>
-      </div>
-    );
+    return <Loader fillColor="#cecece" strokeColor="#797979" />;
   }
 
   if (!loading && !error && content) {

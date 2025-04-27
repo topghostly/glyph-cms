@@ -63,12 +63,31 @@ export const Topbar: React.FC = () => {
   const handleBlogUpload = async (blog: Blog | null) => {
     // GET USER INFORMATION FROM LOCALSTORAGE
     if (!userInfo.userId) {
-      toast("❌ Error: You may not authenticated yet. Please reload the app.");
+      toast(
+        "❌ Error: Looks like you're not authenticated. Please log out and sign in again."
+      );
       return;
     }
 
-    if (!blog || !blog.content.mainImage?.url) {
-      toast("No blog or image found to upload.");
+    if (!blog) {
+      toast("❌ No blog or image found to upload.");
+      return;
+    }
+
+    const { content } = blog;
+
+    if (!content.title || content.title.trim() === "") {
+      toast("❌ Blog title is required.");
+      return;
+    }
+
+    if (!content.mainImage?.url || content.mainImage.url.trim() === "") {
+      toast("❌ Main image is required.");
+      return;
+    }
+
+    if (!content.description || content.description.trim() === "") {
+      toast("❌ Blog description is required.");
       return;
     }
 
@@ -368,6 +387,7 @@ export const Topbar: React.FC = () => {
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => {
+                setActiveBlog(null);
                 logOut();
               }}
             >

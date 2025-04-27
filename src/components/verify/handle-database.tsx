@@ -13,7 +13,6 @@ export default function HandleDatabase({ session }: { session: Session }) {
 
   const addMailToDB = useCallback(
     async (data: User) => {
-      console.log("Adding user to DB:", data);
       try {
         const res = await fetch("/api/user", {
           method: "POST",

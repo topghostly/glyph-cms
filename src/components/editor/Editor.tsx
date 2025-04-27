@@ -10,8 +10,9 @@ import { ActiveTask } from "./components/active-task";
 import { Session } from "next-auth";
 import { useEffect, useState } from "react";
 import { MonitorCheck } from "lucide-react";
-import { getAllBlogs } from "@/util/getAllBlog";
-import { useUser } from "@/store/user-store";
+import HandleBlogSync from "./components/handle-sync-blog";
+// import { getAllBlogs } from "@/util/getAllBlog";
+// import { useUser } from "@/store/user-store";
 // import Image from "next/image";
 
 export interface EditorInterface {
@@ -20,7 +21,7 @@ export interface EditorInterface {
 
 export const Editor: React.FC<EditorInterface> = ({ session }) => {
   const [isScreenTooSmall, setIsScreenTooSmall] = useState(true);
-  const { userInfo } = useUser(); // UserId from user context
+  // const { userInfo } = useUser(); // UserId from user context
   // const [loading, setLoading] = useState<boolean>();
 
   useEffect(() => {
@@ -34,11 +35,7 @@ export const Editor: React.FC<EditorInterface> = ({ session }) => {
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
-  useEffect(() => {
-    getAllBlogs(userInfo.userId);
-  }, []);
-
-  useEffect(() => {});
+  // useEffect(() => {});
 
   if (isScreenTooSmall) {
     return (
@@ -61,6 +58,7 @@ export const Editor: React.FC<EditorInterface> = ({ session }) => {
         }}
       >
         <main className="h-screen w-full relative grid grid-rows-[3.75rem_0.5px_1fr]">
+          <HandleBlogSync />
           <Topbar />
           <Separator className="h-[0.2px] bg-accent" />
           <div className="flex w-full min-h-full relative px-3 max-w-[1440px] mx-auto overflow-x-hidden">

@@ -3,7 +3,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { ImageUp, Plus } from "lucide-react";
+import { ImageMinus, ImageUp, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TextEditor } from "./components/text-editor";
 import { useCallback, useEffect, useState } from "react";
@@ -135,6 +135,20 @@ export const Structure = () => {
     onDrop,
   });
 
+  /* REMOVE MAIN IMAGE */
+  const removeMainImage = () => {
+    setBlog((prevBlog) => ({
+      ...prevBlog,
+      content: {
+        ...prevBlog.content,
+        mainImage: {
+          url: "",
+          alt: "",
+        },
+      },
+    }));
+  };
+
   return (
     <div className="w-full flex flex-col gap-8 pb-5 relative" id="structure">
       {/* BLOG TITLE */}
@@ -157,12 +171,23 @@ export const Structure = () => {
       </div>
 
       {/* MAIN IMAGE */}
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 relative">
         <Label htmlFor="image" className="text-[12px]">
           Main Image
         </Label>
-        <Card className="w-full p-3">
+        <Card className="w-full p-3 relative">
           <CardContent className="flex flex-col gap-5 px-0">
+            {blog.content.mainImage?.url && (
+              <div className="absolute top-4 right-4 z-10">
+                <Button
+                  // className="w-[60px] h-[25px]"
+                  onClick={() => removeMainImage()}
+                >
+                  <ImageMinus />
+                </Button>
+              </div>
+            )}
+
             {blog.content.mainImage?.url ? (
               <div className="w-full relative h-100">
                 <img

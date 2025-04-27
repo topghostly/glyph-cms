@@ -19,16 +19,18 @@ export const getAllBlogs = async (userId: string) => {
     });
 
     const result = await res.json();
-    console.log("The result is from get all blogs", result);
 
     if (res.ok) {
       localStorage.setItem("online-blogs", JSON.stringify(result.blogs));
-      console.log(result.blogs);
+      console.log("Successfully gotten all blogs");
+      return result.blogs;
     } else {
       console.error("Error fetching blogs:", result.error);
+      return null;
     }
   } catch (error) {
     toast(`Error during fetch: ${error}`);
+    return null;
   } finally {
     //   setLoading(false);
   }
