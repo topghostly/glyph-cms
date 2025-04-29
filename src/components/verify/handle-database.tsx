@@ -49,6 +49,8 @@ export default function HandleDatabase({ session }: { session: Session }) {
   );
 
   useEffect(() => {
+    if (!session) return router.replace("/auth");
+
     if (session?.user?.email && session.user.name && session.user.image) {
       const data: User = {
         email: session.user.email,

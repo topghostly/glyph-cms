@@ -18,6 +18,7 @@ import {
 import { useBlogStore } from "@/store/blog-store";
 import { Blog, Node } from "@/type/blog";
 import { useUser } from "@/store/user-store";
+import { toast } from "sonner";
 
 export const Structure = () => {
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
@@ -96,11 +97,19 @@ export const Structure = () => {
     }));
   };
 
+  const MAX_FILE_SIZE_MB = 3; // Maximum image sizw
   /* GET MAIN IMAGE */
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
 
     if (file) {
+      const fileSizeMB = file.size / (1024 * 1024);
+
+      if (fileSizeMB > MAX_FILE_SIZE_MB) {
+        toast("🚫 File too large. Please upload an image under 3MB.");
+        return;
+      }
+
       const reader = new FileReader();
       reader.readAsDataURL(file);
 
@@ -202,8 +211,11 @@ export const Structure = () => {
                 <input {...getInputProps()} type="file" />
                 <Card className="w-full aspect-video rounded overflow-hidden">
                   <CardContent className="grid place-content-center w-full h-full">
-                    <div>
+                    <div className="flex flex-col gap-2 justify-center items-center">
                       <ImageUp size={30} color="#cccccc" strokeWidth={2} />
+                      <p className="text-[#8b8b8b] text-[10px]">
+                        3MB MAX SIZE.
+                      </p>
                     </div>
                   </CardContent>
                 </Card>

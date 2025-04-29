@@ -11,18 +11,17 @@ import { Session } from "next-auth";
 import { useEffect, useState } from "react";
 import { MonitorCheck } from "lucide-react";
 import HandleBlogSync from "./components/handle-sync-blog";
-// import { getAllBlogs } from "@/util/getAllBlog";
-// import { useUser } from "@/store/user-store";
-// import Image from "next/image";
-
+import { useUser } from "@/store/user-store";
+import { useRouter } from "next/navigation";
 export interface EditorInterface {
   session: Session;
 }
 
 export const Editor: React.FC<EditorInterface> = ({ session }) => {
+  const { userInfo } = useUser();
   const [isScreenTooSmall, setIsScreenTooSmall] = useState(true);
-  // const { userInfo } = useUser(); // UserId from user context
-  // const [loading, setLoading] = useState<boolean>();
+
+  const router = useRouter();
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -35,7 +34,10 @@ export const Editor: React.FC<EditorInterface> = ({ session }) => {
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
-  // useEffect(() => {});
+  useEffect(() => {
+    console.log("User information: ", userInfo);
+    if (userInfo.username === "Unknown User") return router.replace("/verify");
+  }, []);
 
   if (isScreenTooSmall) {
     return (

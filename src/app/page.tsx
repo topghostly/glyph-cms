@@ -2,6 +2,7 @@
 
 import { auth } from "@/auth";
 import { Editor } from "@/components/editor/Editor";
+import { ErrorBoundary } from "@/components/error-boundaty";
 import { redirect } from "next/navigation";
 
 export default async function Home() {
@@ -10,7 +11,9 @@ export default async function Home() {
   if (session)
     return (
       <div className="w-screen max-h-screen h-screen bg-background overflow-hidden select-none">
-        <Editor session={session} />
+        <ErrorBoundary>
+          <Editor session={session} />
+        </ErrorBoundary>
       </div>
     );
 
