@@ -1,13 +1,11 @@
 "use client";
 
-// import { useEditorContext } from "@/store/editor";
 import { EditorContent, useEditor, Editor } from "@tiptap/react";
 import { Toolbar } from "../../tool-bar";
 import StarterKit from "@tiptap/starter-kit";
 import TextAlign from "@tiptap/extension-text-align";
 import Highlight from "@tiptap/extension-highlight";
 import Code from "@tiptap/extension-code";
-
 import Link from "@tiptap/extension-link";
 import Underline from "@tiptap/extension-underline";
 import Image from "@tiptap/extension-image";
@@ -16,6 +14,7 @@ import { common, createLowlight } from "lowlight";
 import { Blog, Node } from "@/type/blog";
 import { useEffect } from "react";
 import { debounce } from "lodash";
+import HardBreak from "@tiptap/extension-hard-break";
 
 const lowlight = createLowlight(common);
 
@@ -86,6 +85,7 @@ export const TextEditor: React.FC<TextEditorProps> = ({
           class: "rounded my-10 w-[100%] h-[50vh] object-cover object-center",
         },
       }),
+      HardBreak,
     ],
     content: "<p>Write your Blog body here! 🌎️</p>",
     editorProps: {
@@ -94,6 +94,43 @@ export const TextEditor: React.FC<TextEditorProps> = ({
           "w-full max-h-[80vh] min-h-[300px] overflow-y-scroll scrollbar-h pt-3 px-2 pb-3 border border-accent rounded outline-accent font-medium",
       },
     },
+    // editorProps: {
+    //   handlePaste(view, event) {
+    //     const text = event.clipboardData?.getData("text/plain");
+    //     if (!text) return false;
+
+    //     // Split the text by double newlines to create paragraphs
+    //     const paragraphs = text.split(/\n{2,}/);
+    //     const { schema } = view.state;
+    //     const nodes: any[] = [];
+
+    //     for (const para of paragraphs) {
+    //       // Split paragraph by single newlines to insert hard breaks
+    //       const lines = para.split("\n");
+    //       const paragraphContent = lines.flatMap((line, index) => {
+    //         const lineNodes = [schema.text(line)];
+    //         if (index !== lines.length - 1) {
+    //           lineNodes.push(schema.nodes.hardBreak.create());
+    //         }
+    //         return lineNodes;
+    //       });
+
+    //       const paragraphNode = schema.nodes.paragraph.create(
+    //         {},
+    //         paragraphContent
+    //       );
+    //       nodes.push(paragraphNode);
+    //     }
+
+    //     const fragment =
+    //       schema.nodes.doc.contentMatch.defaultType?.createAndFill?.({}, nodes);
+    //     if (!fragment) return false;
+
+    //     view.dispatch(view.state.tr.replaceSelectionWith(fragment));
+    //     event.preventDefault();
+    //     return true;
+    //   },
+    // },
     onUpdate: ({ editor }) => handleUpdate(editor),
     immediatelyRender: false,
   });

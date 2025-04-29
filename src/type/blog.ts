@@ -77,3 +77,49 @@ export interface BlogUpload {
   content: string;
   creator: string;
 }
+
+[
+  {
+    type: "paragraph",
+    attrs: {
+      textAlign: null,
+    },
+    content: [
+      {
+        type: "text",
+        text: "Whenever comfort finds me, I don’t panic.",
+      },
+      {
+        type: "hardBreak",
+      },
+      {
+        type: "text",
+        text: "I smile.",
+      },
+      {
+        type: "hardBreak",
+      },
+      {
+        type: "text",
+        text: "I take a deep breath.",
+      },
+      {
+        type: "hardBreak",
+      },
+      {
+        type: "text",
+        text: "And I start looking for my next mountain.",
+      },
+      {
+        type: "hardBreak",
+      },
+      {
+        type: "hardBreak",
+      },
+      {
+        type: "text",
+        text: "-Dami",
+      },
+    ],
+  },
+];

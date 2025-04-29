@@ -200,6 +200,9 @@ export const renderText = (node) => {
       }
       return <React.Fragment key={index}>{textElement}</React.Fragment>;
     }
+    if (textNode.type === "hardBreak") {
+      return <br key={index} />;
+    }
     return null;
   });
 };
