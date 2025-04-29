@@ -1,14 +1,7 @@
 import { Separator } from "@/components/ui/separator";
 import React, { useEffect } from "react";
 import { Structure } from "./task/structure";
-import {
-  Ellipsis,
-  Plus,
-  UserRoundPen,
-  Trash2,
-  Link2,
-  ExternalLink,
-} from "lucide-react";
+import { Ellipsis, Plus, UserRoundPen, ExternalLink } from "lucide-react";
 import { StartBlog } from "./task/start-blog";
 import { useBlogStore } from "@/store/blog-store";
 import { EditorInterface } from "../Editor";
