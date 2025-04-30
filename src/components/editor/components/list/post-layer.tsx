@@ -124,6 +124,7 @@ export const PostLayer: React.FC = () => {
           >
             <div className="w-[40px] h-[40px] flex justify-center items-center relative">
               <img
+                key={d.content.mainImage?.url || "default-image"}
                 className="rounded object-center object-cover w-full h-full"
                 src={
                   d.content.mainImage?.url
@@ -131,7 +132,6 @@ export const PostLayer: React.FC = () => {
                     : "/images/png/default-image.webp"
                 }
                 alt={"post image"}
-                // fill
               />
             </div>
             <div className="flex flex-col">
