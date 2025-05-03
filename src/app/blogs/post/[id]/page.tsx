@@ -8,7 +8,7 @@ type Props = {
 
 export async function generateMetadata(
   { params }: Props,
-  parent: ResolvingMetadata
+  _parent?: ResolvingMetadata
 ): Promise<Metadata> {
   try {
     const res = await fetch(`https://glyph-cms.vercel.app/api/blog/get-blog`, {
