@@ -62,10 +62,10 @@ export async function generateMetadata(
   }
 }
 
-interface PageParams {
-  id: string;
-}
+// interface PageParams {
+//   id: string;
+// }
 
-export default function Page({ params }: { params: PageParams }) {
+export default function Page() {
   return <PreviewPage />;
 }
