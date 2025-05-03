@@ -1,12 +1,10 @@
-import { Metadata } from "next";
-// import dynamic from "next/dynamic";
+import { Metadata, ResolvingMetadata } from "next";
 import PreviewPage from "./preview-page";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { id: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: { params: { id: string } },
+  _parent: ResolvingMetadata
+): Promise<Metadata> {
   try {
     const res = await fetch(`https://glyph-cms.vercel.app/api/blog/get-blog`, {
       method: "POST",
