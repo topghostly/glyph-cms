@@ -3,7 +3,7 @@ import PreviewPage from "./preview-page";
 
 export async function generateMetadata(
   { params }: { params: { id: string } },
-  _parent: ResolvingMetadata
+  _: ResolvingMetadata
 ): Promise<Metadata> {
   try {
     const res = await fetch(`https://glyph-cms.vercel.app/api/blog/get-blog`, {
