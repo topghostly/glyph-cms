@@ -1,11 +1,11 @@
 import { Metadata, ResolvingMetadata } from "next";
 import PreviewPage from "./preview-page";
 
-export async function generateMetadata(
-  { params }: { params: { id: string } },
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _parent: ResolvingMetadata
-): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
   try {
     const res = await fetch(`https://glyph-cms.vercel.app/api/blog/get-blog`, {
       method: "POST",
