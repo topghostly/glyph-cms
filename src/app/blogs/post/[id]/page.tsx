@@ -1,4 +1,4 @@
-import { Metadata, ResolvingMetadata } from "next";
+import { Metadata } from "next";
 import PreviewPage from "./preview-page";
 
 export async function generateMetadata({
