@@ -2,16 +2,16 @@
 import { Metadata, ResolvingMetadata } from "next";
 import PreviewPage from "./preview-page";
 
-type Props = {
+interface GenerateMetadataProps {
   params: { id: string };
-  searchParams: Record<string, string | string[] | undefined>;
-};
+  searchParams?: { [key: string]: string | string[] | undefined };
+}
 
 export async function generateMetadata(
-  { params }: Props,
-  parent: ResolvingMetadata
+  { params }: GenerateMetadataProps,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const previousDescription = (await parent).description || "";
   try {
     const res = await fetch(`https://glyph-cms.vercel.app/api/blog/get-blog`, {
       method: "POST",
@@ -49,7 +49,7 @@ export async function generateMetadata(
       twitter: {
         card: "summary_large_image",
         title,
-        description: description ?? previousDescription,
+        description,
         images: [image],
       },
     };
@@ -62,6 +62,10 @@ export async function generateMetadata(
   }
 }
 
-export default function Page() {
+interface PageParams {
+  id: string;
+}
+
+export default function Page({ params }: { params: PageParams }) {
   return <PreviewPage />;
 }
