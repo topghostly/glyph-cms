@@ -1,27 +1,31 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Metadata, ResolvingMetadata } from "next";
 import PreviewPage from "./preview-page";
 
-interface GenerateMetadataProps {
-  params: { id: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
-}
+// 1) declare the proper Props type for generateMetadata
+type GenerateMetadataProps = {
+  params: Promise<{ id: string }>;
+  // if you need searchParams, you can uncomment this:
+  // searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
 
 export async function generateMetadata(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   { params }: GenerateMetadataProps,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _parent: ResolvingMetadata
 ): Promise<Metadata> {
   try {
+    // 2) unwrap the promise
+    const { id } = await params;
+
     const res = await fetch(`https://glyph-cms.vercel.app/api/blog/get-blog`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ _localID: params.id }),
+      body: JSON.stringify({ _localID: id }),
       cache: "no-store",
     });
 
     const result = await res.json();
-
     if (!res.ok || !result.blog) {
       return {
         title: "Blog Not Found | Glyph",
@@ -30,11 +34,11 @@ export async function generateMetadata(
     }
 
     const content = JSON.parse(result.blog.content);
-    const title = content?.content?.title || "Untitled Blog";
+    const title = content.content.title || "Untitled Blog";
     const description =
-      content?.content?.description || "Read this insightful post on Glyph.";
+      content.content.description || "Read this insightful post on Glyph.";
     const image =
-      content?.content?.mainImage?.url ||
+      content.content.mainImage?.url ||
       `${process.env.NEXT_PUBLIC_BASE_URL}/default-og.png`;
 
     return {
@@ -54,17 +58,13 @@ export async function generateMetadata(
       },
     };
   } catch (error) {
-    console.log("Metadata error", error);
+    console.error("Metadata error", error);
     return {
       title: "Error loading metadata | Glyph",
       description: "Something went wrong trying to load the blog.",
     };
   }
 }
-
-// interface PageParams {
-//   id: string;
-// }
 
 export default function Page() {
   return <PreviewPage />;
