@@ -8,8 +8,9 @@ type Props = {
 
 export async function generateMetadata(
   { params }: Props,
-  _parent?: ResolvingMetadata
+  parent: ResolvingMetadata
 ): Promise<Metadata> {
+  const previousDescription = (await parent).description || "";
   try {
     const res = await fetch(`https://glyph-cms.vercel.app/api/blog/get-blog`, {
       method: "POST",
@@ -47,7 +48,7 @@ export async function generateMetadata(
       twitter: {
         card: "summary_large_image",
         title,
-        description,
+        description: description ?? previousDescription,
         images: [image],
       },
     };
