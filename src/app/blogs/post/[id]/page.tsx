@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Metadata, ResolvingMetadata } from "next";
 import PreviewPage from "./preview-page";
 
