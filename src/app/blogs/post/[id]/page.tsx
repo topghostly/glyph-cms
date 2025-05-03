@@ -3,7 +3,8 @@ import PreviewPage from "./preview-page";
 
 export async function generateMetadata(
   { params }: { params: { id: string } },
-  _: ResolvingMetadata
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _parent: ResolvingMetadata
 ): Promise<Metadata> {
   try {
     const res = await fetch(`https://glyph-cms.vercel.app/api/blog/get-blog`, {
