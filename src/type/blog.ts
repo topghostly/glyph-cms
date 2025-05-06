@@ -33,6 +33,7 @@ export type Blog = {
     mainImage?: {
       url?: string;
       alt?: string;
+      key?: string;
     };
     mainImageBlobUrl?: string;
     body?: Node[];
@@ -48,6 +49,7 @@ export type BlogContentProp = {
   mainImage?: {
     url?: string;
     alt?: string;
+    key?: string;
   };
   mainImageBlobUrl?: string;
   body?: {

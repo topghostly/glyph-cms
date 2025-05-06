@@ -130,11 +130,11 @@ export const renderNode = (node, index) => {
           alt={node.attrs?.alt || "no alt image"}
           style={{
             width: "100%",
-            height: "50vh",
+            aspectRatio: "16/9",
             objectFit: "cover",
             objectPosition: "center",
           }}
-          className="my-10 rounded-2xl"
+          className="my-6 rounded-sm"
           width={0}
           height={0}
         />
@@ -144,9 +144,14 @@ export const renderNode = (node, index) => {
       return <blockquote key={index}>{renderText(node)}</blockquote>;
 
     case "codeBlock":
+      const code = node.content?.map((n) => n.text).join("\n") ?? "";
+
       return (
-        <pre key={index} className="bg-gray-900 text-white p-4 rounded">
-          <code>{node.content?.map(renderText)}</code>
+        <pre
+          key={index}
+          className="bg-gray-100/30 border border-gray-200 text-[#00095c] p-4 rounded-sm overflow-x-auto my-4"
+        >
+          <code>{code}</code>
         </pre>
       );
 

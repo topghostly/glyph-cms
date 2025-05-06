@@ -28,6 +28,12 @@ import {
   DropdownMenuSubContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import Image from "next/image";
 import { useBlogStore } from "@/store/blog-store";
 import { cn } from "@/lib/utils";
@@ -36,7 +42,7 @@ import { logOut } from "@/server/auth";
 import { useAuth } from "@/store/auth-store";
 import { Blog } from "@/type/blog";
 import { toast } from "sonner";
-import isEqual from "lodash.isequal";
+// import isEqual from "lodash.isequal";
 import { getAllBlogs } from "@/util/getAllBlog";
 import { base64ToBlob } from "@/util/base64-blob";
 import { useUser } from "@/store/user-store";
@@ -96,6 +102,7 @@ export const Topbar: React.FC = () => {
 
       if (!activeBlog || !activeBlog.content.mainImage) return;
       let finalImageUrl = activeBlog.content.mainImage.url;
+      let finalImageKey = activeBlog.content.mainImage.key;
 
       const imageBlob = base64ToBlob(finalImageUrl!);
 
@@ -117,6 +124,7 @@ export const Topbar: React.FC = () => {
         const { data } = await imageUploadRes.json();
         console.log("✅ Uploaded image URL:", data.publicUrl);
         finalImageUrl = data.publicUrl;
+        finalImageKey = data.filename;
       }
 
       // 2. Replace base64 with final public S3 URL
@@ -127,6 +135,7 @@ export const Topbar: React.FC = () => {
           mainImage: {
             ...blog.content.mainImage,
             url: finalImageUrl,
+            key: finalImageKey,
           },
         },
       });
@@ -137,6 +146,7 @@ export const Topbar: React.FC = () => {
           mainImage: {
             ...blog.content.mainImage,
             url: finalImageUrl,
+            key: finalImageKey,
           },
         },
       };
@@ -176,17 +186,38 @@ export const Topbar: React.FC = () => {
 
   useEffect(() => {
     if (!localStorage.getItem("online-blogs") || !activeBlog) return;
+
     const allOnlineBlog = JSON.parse(localStorage.getItem("online-blogs")!);
 
     const blog = allOnlineBlog.filter(
       (b: Blog) => b._localID === activeBlog?._localID
     );
 
-    if (!blog[0]) return setSyncMode(false);
+    if (!blog[0]) {
+      console.log("The Blog can't be found in the online-blogs");
+      return setSyncMode(false);
+    }
 
     if (blog) {
       const blogContent = JSON.parse(blog[0].content);
-      setSyncMode(isEqual(blogContent.content, activeBlog?.content));
+
+      // console.log("online", blogContent.content);
+      // console.log("local", activeBlog?.content);
+      // console.log(
+      //   "the blog comparism is",
+      //   isEqual(blogContent.content, activeBlog?.content)
+      // );
+      // setSyncMode(isEqual(blogContent.content, activeBlog?.content));
+
+      const onlineLog = JSON.stringify(blogContent.content, null, 2);
+      const localLog = JSON.stringify(activeBlog?.content, null, 2);
+
+      // console.log("online JSON:", onlineLog);
+      // console.log("local  JSON:", localLog);
+
+      // and then
+      // console.log("string equality:", onlineLog === localLog);
+      setSyncMode(onlineLog === localLog);
     }
   }, [activeBlog, uploadTrigger]);
 
@@ -224,93 +255,146 @@ export const Topbar: React.FC = () => {
         </Button>
       </div>
       <div className="h-full flex gap-3 justify-center items-center">
-        <Button
-          size={"sm"}
-          className={cn(
-            `${
-              activeTask === "structure"
-                ? "text-white/80 text-[12px]"
-                : "border-none bg-background text-white text-[12px]"
-            }`
-          )}
-          variant={"outline"}
-          onClick={() => setActiveTask("structure")}
-          disabled={!activeTask}
-        >
-          <LayoutPanelTop />
-          Structure
-        </Button>
-        <Button
-          variant={"outline"}
-          size={"sm"}
-          className={cn(
-            `${
-              activeTask === "preview"
-                ? "text-white/80 text-[12px]"
-                : "border-none bg-background text-white text-[12px]"
-            }`
-          )}
-          onClick={() => {
-            window.open("/preview", "_blank");
-          }}
-          disabled={
-            activeBlog?.content.title === "" ||
-            activeBlog?.content.title === "Untitled Blog" ||
-            !activeBlog?.content.mainImage?.url ||
-            !activeTask
-          }
-        >
-          <Columns2 />
-          Preview
-        </Button>
-        <Button
-          variant={"outline"}
-          size={"sm"}
-          className={cn(
-            `${
-              activeTask === "code"
-                ? "text-white/80 text-[12px]"
-                : "border-none bg-background text-white text-[12px]"
-            }`
-          )}
-          onClick={() => setActiveTask("code")}
-          disabled={!activeTask}
-        >
-          <FileJson size={16} /> JSON
-        </Button>
+        {/* STRUCTURE BUTTON */}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size={"sm"}
+                className={cn(
+                  `${
+                    activeTask === "structure"
+                      ? "text-white/80 text-[12px]"
+                      : "border-none bg-background text-white text-[12px]"
+                  }`
+                )}
+                variant={"outline"}
+                onClick={() => setActiveTask("structure")}
+                disabled={!activeTask}
+              >
+                <LayoutPanelTop />
+                Structure
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Edit blog</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        {/* PREVIEW BUTTON */}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant={"outline"}
+                size={"sm"}
+                className={cn(
+                  `${
+                    activeTask === "preview"
+                      ? "text-white/80 text-[12px]"
+                      : "border-none bg-background text-white text-[12px]"
+                  }`
+                )}
+                onClick={() => {
+                  window.open("/preview", "_blank");
+                }}
+                disabled={
+                  activeBlog?.content.title === "" ||
+                  activeBlog?.content.title === "Untitled Blog" ||
+                  !activeBlog?.content.mainImage?.url ||
+                  !activeTask
+                }
+              >
+                <Columns2 />
+                Preview
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Preview blog in new tab</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        {/* JSON BUTTON */}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant={"outline"}
+                size={"sm"}
+                className={cn(
+                  `${
+                    activeTask === "code"
+                      ? "text-white/80 text-[12px]"
+                      : "border-none bg-background text-white text-[12px]"
+                  }`
+                )}
+                onClick={() => setActiveTask("code")}
+                disabled={!activeTask}
+              >
+                <FileJson size={16} /> JSON
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Blog's body JSON</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
       <div className="h-full flex gap-5 justify-center items-center">
-        <div>
-          <p className="text-[13px] text-white/30">
-            Blog status{" "}
-            <span
-              className={cn(
-                "w-1.5 h-1.5 rounded-full inline-block ml-1",
-                syncMode
-                  ? " bg-green-500 hover:bg-green-950"
-                  : " bg-amber-500 hover:bg-amber-950",
-                !activeBlog && "bg-white/80 border-white/5 hover:bg-white/10"
-              )}
-            />
-          </p>
-        </div>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <div>
+                <p className="text-[13px] text-white/30">
+                  Blog status{" "}
+                  <span
+                    className={cn(
+                      "w-1.5 h-1.5 rounded-full inline-block ml-1",
+                      syncMode
+                        ? " bg-green-500 hover:bg-green-950"
+                        : " bg-amber-500 hover:bg-amber-950",
+                      !activeBlog &&
+                        "bg-white/80 border-white/5 hover:bg-white/10"
+                    )}
+                  />
+                </p>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>
+                {syncMode
+                  ? "All changes are up to date on the server"
+                  : "Your blog isn't synced yet. upload to sync"}
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
 
-        <Button
-          variant={"outline"}
-          size={"sm"}
-          className="w-8 h-8"
-          onClick={() => {
-            if (!syncMode && activeBlog) handleBlogUpload(activeBlog);
-          }}
-        >
-          {uploading ? (
-            <div className="flex items-center justify-center">
-              <div className="w-[15px] h-[15px] border-1 border-white/80 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          ) : (
-            <ArrowUpToLine size={12} strokeWidth={2} />
-          )}
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant={"outline"}
+                size={"sm"}
+                className="w-8 h-8"
+                onClick={() => {
+                  if (!syncMode && activeBlog) handleBlogUpload(activeBlog);
+                }}
+              >
+                {uploading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="w-[15px] h-[15px] border-1 border-white/80 border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                ) : (
+                  <ArrowUpToLine size={12} strokeWidth={2} />
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Upload</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

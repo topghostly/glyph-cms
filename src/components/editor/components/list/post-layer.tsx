@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useBlogStore } from "@/store/blog-store";
 import { Ellipsis, Plus, Search, Trash2, UserRoundPen } from "lucide-react";
-// import Image from "next/image";
 import { toast } from "sonner";
 import { useUser } from "@/store/user-store";
 
@@ -29,9 +28,29 @@ export const PostLayer: React.FC = () => {
   const { userInfo } = useUser(); // UserId from user context
 
   /* FUNCTION TO DELETE A BLOG */
-  const handleBlogDelete = async (blogLocalId: string) => {
+  const handleBlogDelete = async (
+    blogLocalId: string,
+    key: string | undefined
+  ) => {
     setDeletingBlogId(blogLocalId);
     try {
+      if (key) {
+        const deletedImage = await fetch("/api/bucket/delete-image", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            key: key,
+          }),
+        });
+
+        if (!deletedImage.ok) {
+          toast("❌ Image deletion failed.");
+          return;
+        }
+      }
+
       const res = await fetch("/api/blog/delete-blog", {
         method: "DELETE",
         headers: {
@@ -155,7 +174,10 @@ export const PostLayer: React.FC = () => {
                       <DropdownMenuItem
                         onClick={(event) => {
                           event.stopPropagation();
-                          handleBlogDelete(d._localID);
+                          handleBlogDelete(
+                            d._localID,
+                            d.content.mainImage?.key
+                          );
                         }}
                       >
                         <Trash2 />

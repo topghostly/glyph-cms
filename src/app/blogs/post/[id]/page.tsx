@@ -60,7 +60,7 @@ export async function generateMetadata(
   } catch (error) {
     console.error("Metadata error", error);
     return {
-      title: "Error loading metadata | Glyph",
+      title: "Post | Glyph",
       description: "Something went wrong trying to load the blog.",
     };
   }

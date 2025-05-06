@@ -100,7 +100,7 @@ export default function PreviewPage() {
                       {content?.title}
                     </h1>
                   </div>
-                  <div className="w-full aspect-[16/9] relative my-10">
+                  <div className="w-full aspect-[16/10] relative my-10">
                     {content?.mainImage?.url && (
                       <Image
                         src={content.mainImage.url}

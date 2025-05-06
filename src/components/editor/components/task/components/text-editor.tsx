@@ -15,6 +15,7 @@ import { Blog, Node } from "@/type/blog";
 import { useEffect } from "react";
 import { debounce } from "lodash";
 import HardBreak from "@tiptap/extension-hard-break";
+import { useImageCleanup } from "@/hooks/useImageCleanUp";
 
 const lowlight = createLowlight(common);
 
@@ -134,6 +135,8 @@ export const TextEditor: React.FC<TextEditorProps> = ({
     onUpdate: ({ editor }) => handleUpdate(editor),
     immediatelyRender: false,
   });
+
+  useImageCleanup(editor);
 
   useEffect(() => {
     if (editor) {

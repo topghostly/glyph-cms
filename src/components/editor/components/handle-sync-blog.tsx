@@ -9,13 +9,14 @@ export default function HandleBlogSync() {
   const { userInfo } = useUser();
   const blogs = useBlogStore((state) => state.blogs);
   const addBlog = useBlogStore((state) => state.addBlog);
-  const hasSynced = useRef(false); // 👈🏽 Add this
+  const hasSynced = useRef(false);
 
   const handleSync = async () => {
     const allLocalBlogsID = blogs.map((blog) => blog._localID);
 
     const onlineBlogs = await getAllBlogs(userInfo.userId);
 
+    if (!onlineBlogs) return;
     for (const onlineBlog of onlineBlogs) {
       const onlineContent = JSON.parse(onlineBlog.content);
       if (!allLocalBlogsID.includes(onlineContent._localID)) {

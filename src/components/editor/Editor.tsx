@@ -35,7 +35,6 @@ export const Editor: React.FC<EditorInterface> = ({ session }) => {
   }, []);
 
   useEffect(() => {
-    console.log("User information: ", userInfo);
     if (userInfo.username === "Unknown User") return router.replace("/verify");
   }, []);
 
