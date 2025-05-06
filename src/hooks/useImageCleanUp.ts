@@ -2,6 +2,7 @@
 import { useEffect, useRef } from "react";
 import type { Editor } from "@tiptap/react";
 import { listImageKeys } from "@/util/list-image-keys";
+import { Node } from "@/type/blog";
 
 export function useImageCleanup(editor: Editor | null) {
   // keep the “last known” list of keys
@@ -12,7 +13,7 @@ export function useImageCleanup(editor: Editor | null) {
 
     const onUpdate = () => {
       const json = editor.getJSON();
-      const currentKeys = listImageKeys(json);
+      const currentKeys = listImageKeys(json as unknown as Node);
 
       // find keys that were in prevKeys but no longer in currentKeys
       const removed = prevKeys.current.filter((k) => !currentKeys.includes(k));
@@ -37,7 +38,7 @@ export function useImageCleanup(editor: Editor | null) {
     };
 
     // initialize first run
-    prevKeys.current = listImageKeys(editor.getJSON());
+    prevKeys.current = listImageKeys(editor.getJSON() as unknown as Node);
     // subscribe
     editor.on("update", onUpdate);
     return () => {
