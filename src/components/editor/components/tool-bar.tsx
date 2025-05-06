@@ -9,7 +9,7 @@ import {
   //   AlignRight,
   Bold,
   Code,
-  CodeIcon,
+  // CodeIcon,
   Eraser,
   Heading1,
   Heading2,
@@ -24,7 +24,7 @@ import {
   Strikethrough,
   Text,
   Undo,
-  Upload,
+  // Upload,
   // Upload,
 } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
@@ -36,18 +36,18 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { getRandomNumber } from "@/util/generate-number";
-import { useState } from "react";
+// import { useState } from "react";
 
 export const Toolbar = ({ editor }: { editor: Editor | null }) => {
   if (!editor) {
     return null;
   }
 
-  const [pendingKeys, setPendingKeys] = useState<string[]>([]);
+  // const [pendingKeys, setPendingKeys] = useState<string[]>([]);
 
-  const addPendingImage = (key: string) => {
-    setPendingKeys((all) => [...all, key]);
-  };
+  // const addPendingImage = (key: string) => {
+  //   setPendingKeys((all) => [...all, key]);
+  // };
 
   const OPTIONS = [
     // {
@@ -193,7 +193,7 @@ export const Toolbar = ({ editor }: { editor: Editor | null }) => {
             })
             .run();
 
-          addPendingImage(filename);
+          // addPendingImage(filename);
         };
         input.click();
       },

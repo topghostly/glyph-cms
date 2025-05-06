@@ -1,8 +1,9 @@
+import { Node } from "@/type/blog";
 import { extractS3Key } from "./get-s3-key";
 
-export function listImageKeys(doc: any): string[] {
+export function listImageKeys(doc: Node): string[] {
   const keys: string[] = [];
-  const recurse = (node: any) => {
+  const recurse = (node: Node) => {
     if (node.type === "image" && node.attrs?.src) {
       keys.push(extractS3Key(node.attrs.src));
     }

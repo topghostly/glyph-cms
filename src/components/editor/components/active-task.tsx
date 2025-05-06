@@ -37,7 +37,7 @@ export const ActiveTask: React.FC<EditorInterface> = ({ session }) => {
             <div className="w-7 h-7 grid place-content-center rounded hover:bg-accent">
               <DropdownMenu>
                 <DropdownMenuTrigger className="outline-none">
-                  <div className="flex justify-center items-center w-full h-full bg-red-600">
+                  <div className="flex justify-center items-center w-full h-full">
                     <Ellipsis size={18} />
                   </div>
                 </DropdownMenuTrigger>

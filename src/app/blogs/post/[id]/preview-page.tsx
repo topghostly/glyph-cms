@@ -91,7 +91,7 @@ export default function PreviewPage() {
         </nav>
         {/*  NAVBAR */}
         <div className="bg-gray-50 text-[#334155] min-h-screen select-none pt-[100px] w-full">
-          <div className="w-[100%] mx-auto max-w-[1100px] flex gap-5 px-5">
+          <div className="w-[100%] mx-auto max-w-[1100px] flex gap-5 px-0 md:px-5">
             <main className="w-[100%]">
               <div className="max-w-[870px] w-full">
                 <div className="prose border py-10 border-gray-200 bg-white">

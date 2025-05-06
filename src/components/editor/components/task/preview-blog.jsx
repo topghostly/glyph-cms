@@ -124,20 +124,19 @@ export const renderNode = (node, index) => {
 
     case "image":
       return (
-        <Image
-          key={index}
-          src={node.attrs?.src}
-          alt={node.attrs?.alt || "no alt image"}
-          style={{
-            width: "100%",
-            aspectRatio: "16/9",
-            objectFit: "cover",
-            objectPosition: "center",
-          }}
-          className="my-6 rounded-sm"
-          width={0}
-          height={0}
-        />
+        <div className="w-full aspect-[16/10] relative">
+          <Image
+            key={index}
+            src={node.attrs?.src}
+            alt={node.attrs?.alt || "no alt image"}
+            style={{
+              objectFit: "cover",
+              objectPosition: "center",
+            }}
+            className="my-6 rounded-sm"
+            fill
+          />
+        </div>
       );
 
     case "blockquote":

@@ -335,7 +335,7 @@ export const Topbar: React.FC = () => {
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Blog's body JSON</p>
+              <p>Blog&apos;s body JSON</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
