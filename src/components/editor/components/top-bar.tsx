@@ -230,29 +230,38 @@ export const Topbar: React.FC = () => {
           width={32}
           height={32}
         />
-        <Button
-          size={"sm"}
-          variant={"outline"}
-          onClick={() => {
-            const newBlogID = crypto.randomUUID();
-            addBlog({
-              _localID: newBlogID,
-              content: {
-                title: "Untitled Blog",
-                description: "",
-              },
-              creator: userInfo?.userId ?? "Unknown",
-            });
-            setActiveBlog(newBlogID);
-            setActiveTask("structure");
-          }}
-          className="cursor-pointer"
-        >
-          <span className="flex gap-1 justify-between items-center text-[12px] text-white/80">
-            <Plus size={20} strokeWidth={1} />
-            Create
-          </span>
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size={"sm"}
+                variant={"outline"}
+                onClick={() => {
+                  const newBlogID = crypto.randomUUID();
+                  addBlog({
+                    _localID: newBlogID,
+                    content: {
+                      title: "Untitled Blog",
+                      description: "",
+                    },
+                    creator: userInfo?.userId ?? "Unknown",
+                  });
+                  setActiveBlog(newBlogID);
+                  setActiveTask("structure");
+                }}
+                className="cursor-pointer"
+              >
+                <span className="flex gap-1 justify-between items-center text-[12px] text-white/80">
+                  <Plus size={20} strokeWidth={1} />
+                  Create
+                </span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Create new blog post</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
       <div className="h-full flex gap-3 justify-center items-center">
         {/* STRUCTURE BUTTON */}
@@ -472,6 +481,7 @@ export const Topbar: React.FC = () => {
             <DropdownMenuItem
               onClick={() => {
                 setActiveBlog(null);
+                setActiveTask(null);
                 logOut();
               }}
             >

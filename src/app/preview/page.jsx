@@ -32,19 +32,19 @@ export default function PreviewPage() {
             </p>
           </div>
           {/* SIGNUP BUTTON */}
-          <Button
+          {/* <Button
             variant={"default"}
             className="hover:bg-gray-200 border border-gray-200"
           >
             Sign Up
-          </Button>
+          </Button> */}
         </div>
       </nav>
       {/*  NAVBAR */}
       <div className="bg-gray-50 text-[#334155] min-h-screen select-none pt-[100px] w-full">
-        <div className="w-[100%] mx-auto max-w-[1100px] flex gap-5 px-0 md:px-5">
-          <main className="w-[100%]">
-            <div className="max-w-[870px] w-full">
+        <div className="w-[100%] mx-auto max-w-[1100px] flex gap-5 px-0 md:px-5 justify-center items-center">
+          <main className="w-[850px]">
+            <div className=" w-full">
               <div className="prose border py-10 border-gray-200 bg-white">
                 <div className="padding-x w-full">
                   <h1 className="text-[2.2rem] md:text-[2.5rem] m-0 text-gray-800">
@@ -89,10 +89,9 @@ export default function PreviewPage() {
               </div>
             </div>
           </main>
-          <aside className="w-[290px] sticky top-[90px] h-fit md:flex flex-col gap-5 hidden">
+          {/* <aside className="w-[290px] sticky top-[90px] h-fit md:flex flex-col gap-5 hidden">
             <AdvertBoard />
-            {/* <CreatorBoard /> */}
-          </aside>
+          </aside> */}
         </div>
       </div>
     </>
