@@ -6,13 +6,17 @@ import AdvertBoard from "@/components/preview/advert-board";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function PreviewPage() {
   const [content, setcontent] = useState();
+  const router = useRouter();
 
   useEffect(() => {
     const blogs = JSON.parse(localStorage.getItem("local-blogs"));
-    setcontent(blogs.state.activeBlog.content);
+    const activeBlog = blogs.state.activeBlog.content;
+    if (!activeBlog) return router.replace("/");
+    setcontent(activeBlog);
   }, []);
   return (
     <>
