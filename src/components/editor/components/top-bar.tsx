@@ -161,7 +161,7 @@ export const Topbar: React.FC = () => {
           _localID: blog._localID,
           content: JSON.stringify(updatedBlog),
           creator: userInfo.userId,
-          link: `https://glyph-cms.vercel.app/blogs/post/${blog._localID}`,
+          link: `https://www.getglyph.app/blogs/post/${blog._localID}`,
         }),
       });
 

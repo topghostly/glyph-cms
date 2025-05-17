@@ -48,7 +48,7 @@ export const ActiveTask: React.FC<EditorInterface> = ({ session }) => {
                         try {
                           if (!activeBlog?._localID) return;
                           await navigator.clipboard.writeText(
-                            `https://glyph-cms.vercel.app/blogs/post/${activeBlog._localID}`
+                            `https://www.getglyph.app/blogs/post/${activeBlog._localID}`
                           );
 
                           toast("✅ External blog link copied");
