@@ -7,7 +7,7 @@ import "./globals.css";
 import { UserProvider } from "@/store/user-store";
 
 export const metadata: Metadata = {
-  title: "Glyph • A new way to write",
+  title: "Editor • Write, Edit & Preview",
   description:
     "Manage your blog posts efficiently with an intuitive interface. Search through titles, add new posts, edit existing ones, and delete outdated content with ease.",
 };
