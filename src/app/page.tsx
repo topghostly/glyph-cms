@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth";
 import { Editor } from "@/components/editor/Editor";
-import { ErrorBoundary } from "@/components/error-boundaty";
+import { ErrorBoundary } from "@/components/error-boundary";
 import { redirect } from "next/navigation";
 
 export default async function Home() {

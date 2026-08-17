@@ -1,13 +1,20 @@
 import { Separator } from "@/components/ui/separator";
-import React, { useEffect } from "react";
+import React from "react";
+import dynamic from "next/dynamic";
 import { Structure } from "./task/structure";
 import { Ellipsis, Plus, UserRoundPen, ExternalLink } from "lucide-react";
 import { StartBlog } from "./task/start-blog";
 import { useBlogStore } from "@/store/blog-store";
 import { EditorInterface } from "../Editor";
-import { useAuth } from "@/store/auth-store";
-import RichTextRenderer from "./task/preview-blog";
-import CodePreview from "./task/code-preview";
+
+// Only rendered when their tab is selected — keep them out of the
+// initial editor chunk.
+const RichTextRenderer = dynamic(() => import("./task/preview-blog"), {
+  ssr: false,
+});
+const CodePreview = dynamic(() => import("./task/code-preview"), {
+  ssr: false,
+});
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,17 +24,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 
-export const ActiveTask: React.FC<EditorInterface> = ({ session }) => {
+export const ActiveTask: React.FC<EditorInterface> = () => {
   const activeTask = useBlogStore((state) => state.activeTask);
   const setActiveBlog = useBlogStore((state) => state.setActiveBlog);
   const setActiveTask = useBlogStore((state) => state.setActiveTask);
   const activeBlog = useBlogStore((state) => state.activeBlog);
-
-  const { updateSession } = useAuth();
-
-  useEffect(() => {
-    updateSession(session);
-  });
 
   return (
     <div className="w-full h-full overflow-y-scroll relative scrollbar-h">
@@ -61,7 +62,9 @@ export const ActiveTask: React.FC<EditorInterface> = ({ session }) => {
                       <ExternalLink />
                       <span>Share Blog</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setActiveTask("structure")}
+                    >
                       <UserRoundPen />
                       <span>Edit Blog</span>
                     </DropdownMenuItem>

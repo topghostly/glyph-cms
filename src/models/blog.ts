@@ -5,6 +5,8 @@ const BlogSchema = new Schema(
     _localID: {
       type: String,
       required: true,
+      unique: true,
+      index: true,
     },
     content: {
       type: String,
@@ -13,6 +15,7 @@ const BlogSchema = new Schema(
     creator: {
       type: String,
       required: true,
+      index: true,
     },
     link: {
       type: String,

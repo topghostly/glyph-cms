@@ -39,21 +39,15 @@ import { useBlogStore } from "@/store/blog-store";
 import { cn } from "@/lib/utils";
 import React, { useEffect, useState } from "react";
 import { logOut } from "@/server/auth";
-import { useAuth } from "@/store/auth-store";
 import { Blog } from "@/type/blog";
 import { toast } from "sonner";
-// import isEqual from "lodash.isequal";
 import { getAllBlogs } from "@/util/getAllBlog";
-import { base64ToBlob } from "@/util/base64-blob";
-import { useUser } from "@/store/user-store";
+import { Session } from "next-auth";
 
-export const Topbar: React.FC = () => {
-  const { session } = useAuth();
-
+export const Topbar: React.FC<{ session: Session }> = ({ session }) => {
   const [syncMode, setSyncMode] = useState<boolean>(false);
   const [uploadTrigger, setUploadTrigger] = useState(false);
   const [uploading, setUploading] = useState<boolean>(false);
-  // const [userInfo, setUserInfo] = useState<LocalUserInfoProps>();
 
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
   const addBlog = useBlogStore((state) => state.addBlog);
@@ -61,20 +55,10 @@ export const Topbar: React.FC = () => {
   const setActiveBlog = useBlogStore((state) => state.setActiveBlog);
   const activeTask = useBlogStore((state) => state.activeTask);
   const activeBlog = useBlogStore((state) => state.activeBlog);
-  const updateBlog = useBlogStore((state) => state.updateBlog);
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
-  const { userInfo } = useUser();
 
   /* FUNCTION TO UPLOAD BLOG TO THE DATABASE */
   const handleBlogUpload = async (blog: Blog | null) => {
-    // GET USER INFORMATION FROM LOCALSTORAGE
-    if (!userInfo.userId) {
-      toast(
-        "❌ Error: Looks like you're not authenticated. Please log out and sign in again."
-      );
-      return;
-    }
-
     if (!blog) {
       toast("❌ No blog or image found to upload.");
       return;
@@ -100,81 +84,33 @@ export const Topbar: React.FC = () => {
     try {
       setUploading(true);
 
-      if (!activeBlog || !activeBlog.content.mainImage) return;
-      let finalImageUrl = activeBlog.content.mainImage.url;
-      let finalImageKey = activeBlog.content.mainImage.key;
-
-      const imageBlob = base64ToBlob(finalImageUrl!);
-
-      // 1. Upload the image to S3
-      if (imageBlob instanceof Blob) {
-        const formData = new FormData();
-        formData.append("file", imageBlob, `${activeBlog._localID}-main.jpg`);
-
-        const imageUploadRes = await fetch("/api/bucket/image-upload", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!imageUploadRes.ok) {
-          toast("❌ Image upload failed.");
-          return;
-        }
-
-        const { data } = await imageUploadRes.json();
-        console.log("✅ Uploaded image URL:", data.publicUrl);
-        finalImageUrl = data.publicUrl;
-        finalImageKey = data.filename;
-      }
-
-      // 2. Replace base64 with final public S3 URL
-      updateBlog({
-        ...blog,
-        content: {
-          ...blog.content,
-          mainImage: {
-            ...blog.content.mainImage,
-            url: finalImageUrl,
-            key: finalImageKey,
-          },
-        },
-      });
-      const updatedBlog = {
-        ...blog,
-        content: {
-          ...blog.content,
-          mainImage: {
-            ...blog.content.mainImage,
-            url: finalImageUrl,
-            key: finalImageKey,
-          },
-        },
-      };
-
-      // 3. Upload blog to DB
+      // The cover image is already an S3 URL — it is uploaded on drop, so
+      // there is nothing to convert here.
       const blogUploadRes = await fetch("/api/blog/upload", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           _localID: blog._localID,
-          content: JSON.stringify(updatedBlog),
-          creator: userInfo.userId,
+          content: JSON.stringify(blog),
           link: `https://www.getglyph.app/blogs/post/${blog._localID}`,
         }),
       });
 
-      const result = await blogUploadRes.json();
-      console.log(result);
-      await getAllBlogs(userInfo.userId);
-
       if (blogUploadRes.ok) {
-        toast(`✅ '${updatedBlog.content.title}' has been uploaded`);
+        toast(`✅ '${blog.content.title}' has been uploaded`);
         setUploadTrigger((prev) => !prev);
-      } else {
-        toast("❌ Blog upload failed.");
+        return;
       }
+
+      if (blogUploadRes.status === 403) {
+        toast("❌ That post belongs to another account.");
+        return;
+      }
+
+      const { error } = await blogUploadRes
+        .json()
+        .catch(() => ({ error: null }));
+      toast(`❌ ${error ?? "Blog upload failed."}`);
     } catch (error) {
       toast(`❌ UPLOAD ERROR: ${String(error)}`);
     } finally {
@@ -184,41 +120,36 @@ export const Topbar: React.FC = () => {
 
   /* FUNCTION TO UPLOAD BLOG TO THE DATABASE */
 
+  // Tracks whether the local draft matches what was last published, so the
+  // publish button can show a synced state.
   useEffect(() => {
-    if (!localStorage.getItem("online-blogs") || !activeBlog) return;
+    if (!activeBlog) return setSyncMode(false);
 
-    const allOnlineBlog = JSON.parse(localStorage.getItem("online-blogs")!);
+    let cancelled = false;
 
-    const blog = allOnlineBlog.filter(
-      (b: Blog) => b._localID === activeBlog?._localID
-    );
+    (async () => {
+      const onlineBlogs = await getAllBlogs();
+      if (cancelled || !onlineBlogs) return;
 
-    if (!blog[0]) {
-      console.log("The Blog can't be found in the online-blogs");
-      return setSyncMode(false);
-    }
+      const match = onlineBlogs.find(
+        (b: { _localID: string }) => b._localID === activeBlog._localID
+      );
+      if (!match) return setSyncMode(false);
 
-    if (blog) {
-      const blogContent = JSON.parse(blog[0].content);
+      try {
+        const published = JSON.parse(match.content) as Blog;
+        setSyncMode(
+          JSON.stringify(published.content) ===
+            JSON.stringify(activeBlog.content)
+        );
+      } catch {
+        setSyncMode(false);
+      }
+    })();
 
-      // console.log("online", blogContent.content);
-      // console.log("local", activeBlog?.content);
-      // console.log(
-      //   "the blog comparism is",
-      //   isEqual(blogContent.content, activeBlog?.content)
-      // );
-      // setSyncMode(isEqual(blogContent.content, activeBlog?.content));
-
-      const onlineLog = JSON.stringify(blogContent.content, null, 2);
-      const localLog = JSON.stringify(activeBlog?.content, null, 2);
-
-      // console.log("online JSON:", onlineLog);
-      // console.log("local  JSON:", localLog);
-
-      // and then
-      // console.log("string equality:", onlineLog === localLog);
-      setSyncMode(onlineLog === localLog);
-    }
+    return () => {
+      cancelled = true;
+    };
   }, [activeBlog, uploadTrigger]);
 
   return (
@@ -244,7 +175,8 @@ export const Topbar: React.FC = () => {
                       title: "Untitled Blog",
                       description: "",
                     },
-                    creator: userInfo?.userId ?? "Unknown",
+                    // Server overwrites this from the session on publish.
+                    creator: "",
                   });
                   setActiveBlog(newBlogID);
                   setActiveTask("structure");
@@ -438,19 +370,16 @@ export const Topbar: React.FC = () => {
                     <DropdownMenuItem
                       onClick={async () => {
                         try {
-                          if (!userInfo?.userId) return;
-
-                          await navigator.clipboard.writeText(userInfo.userId); // <-- remove the !
-
+                          await navigator.clipboard.writeText(session.user.id);
                           toast("✅ Access key copied");
                         } catch (error) {
                           toast("❌ Unable to copy access key");
-                          console.log(error);
+                          console.error(error);
                         }
                       }}
                     >
                       <KeySquare size={15} />
-                      <span>{userInfo?.userId}</span>
+                      <span>{session.user.id}</span>
                     </DropdownMenuItem>
                   </DropdownMenuSubContent>
                 </DropdownMenuPortal>

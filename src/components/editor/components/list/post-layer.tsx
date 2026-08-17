@@ -7,13 +7,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useBlogStore } from "@/store/blog-store";
 import { Ellipsis, Plus, Search, Trash2, UserRoundPen } from "lucide-react";
 import { toast } from "sonner";
-import { useUser } from "@/store/user-store";
+import { Session } from "next-auth";
 
-export const PostLayer: React.FC = () => {
+export const PostLayer: React.FC<{ session: Session }> = ({ session }) => {
   const [deletingBlogId, setDeletingBlogId] = useState<string | null>(null);
 
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
@@ -24,8 +25,6 @@ export const PostLayer: React.FC = () => {
   const setActiveBlog = useBlogStore((state) => state.setActiveBlog);
   const addBlog = useBlogStore((state) => state.addBlog);
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
-
-  const { userInfo } = useUser(); // UserId from user context
 
   /* FUNCTION TO DELETE A BLOG */
   const handleBlogDelete = async (
@@ -61,9 +60,9 @@ export const PostLayer: React.FC = () => {
         }),
       });
 
-      const result = await res.json();
-
-      if (res.ok || result.error === "No blog found with that _localID") {
+      // A 404 means it was never persisted (or is already gone) — either
+      // way, dropping the local copy is correct.
+      if (res.ok || res.status === 404) {
         deleteBlog(blogLocalId);
         setActiveTask(null);
         setActiveBlog(null);
@@ -81,7 +80,11 @@ export const PostLayer: React.FC = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  const userBlogs = blogs.filter((b) => b.creator === userInfo.userId);
+  // Drafts created locally have an empty creator until first publish, so
+  // include those alongside this author's synced posts.
+  const userBlogs = blogs.filter(
+    (b) => !b.creator || b.creator === session.user.id
+  );
 
   const filteredBlogs = userBlogs.filter((blog) =>
     blog.content.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -101,7 +104,8 @@ export const PostLayer: React.FC = () => {
                 title: "Untitled Blog",
                 description: "",
               },
-              creator: userInfo.userId ?? "Unknown",
+              // Server overwrites this from the session on publish.
+              creator: "",
             });
             setActiveBlog(newBlogID);
             setActiveTask("structure");
@@ -127,9 +131,9 @@ export const PostLayer: React.FC = () => {
       </div>
       {/* SEARCH INPUT FIELD */}
       <div className="flex flex-col gap-1 w-full">
-        {filteredBlogs.map((d, index) => (
+        {filteredBlogs.map((d) => (
           <div
-            key={index}
+            key={d._localID}
             onClick={() => {
               setActiveBlog(d._localID);
               setActiveTask("structure");
@@ -142,22 +146,21 @@ export const PostLayer: React.FC = () => {
             )}
           >
             <div className="w-[40px] h-[40px] flex justify-center items-center relative">
-              <img
-                key={d.content.mainImage?.url || "default-image"}
-                className="rounded object-center object-cover w-full h-full"
+              <Image
                 src={
-                  d.content.mainImage?.url
-                    ? d.content.mainImage?.url
-                    : "/images/png/default-image.webp"
+                  d.content.mainImage?.url || "/images/png/default-image.webp"
                 }
-                alt={"post image"}
+                alt=""
+                fill
+                sizes="40px"
+                className="rounded object-center object-cover"
               />
             </div>
             <div className="flex flex-col">
               <p className="text-[14px] font-bold truncate w-[170px]">
                 {d.content.title !== "" ? d.content.title : "Untitled Blog"}
               </p>
-              <p className="text-[10px]">{userInfo.username}</p>
+              <p className="text-[10px]">{session.user.name}</p>
             </div>
             <div>
               {deletingBlogId === d._localID ? (
@@ -183,7 +186,13 @@ export const PostLayer: React.FC = () => {
                         <Trash2 />
                         <span>Delete Blog</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setActiveBlog(d._localID);
+                          setActiveTask("structure");
+                        }}
+                      >
                         <UserRoundPen />
                         <span>Edit Blog</span>
                       </DropdownMenuItem>

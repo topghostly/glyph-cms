@@ -1,37 +1,26 @@
 import { toast } from "sonner";
 
-export const getAllBlogs = async (userId: string) => {
-  console.log("Started fetching");
-
-  if (!userId) {
-    console.warn("No userId found in userInfo. Cannot fetch blogs.");
-    //   setLoading(false);
-    return;
-  }
-
+/**
+ * Fetches the signed-in author's posts. The server derives the user from
+ * the session, so no id is passed.
+ */
+export const getAllBlogs = async () => {
   try {
     const res = await fetch("/api/blog/get-all-blog", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userId }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
     });
 
-    const result = await res.json();
-
-    if (res.ok) {
-      localStorage.setItem("online-blogs", JSON.stringify(result.blogs));
-      console.log("Successfully gotten all blogs");
-      return result.blogs;
-    } else {
-      console.error("Error fetching blogs:", result.error);
+    if (!res.ok) {
+      console.error("Error fetching blogs:", res.status);
       return null;
     }
+
+    const result = await res.json();
+    return result.blogs;
   } catch (error) {
     toast(`Error during fetch: ${error}`);
     return null;
-  } finally {
-    //   setLoading(false);
   }
 };

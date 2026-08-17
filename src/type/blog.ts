@@ -1,27 +1,49 @@
 export type Mark = {
-  type: "bold" | "italic" | "link" | "strike" | "highlight" | "code";
+  type:
+    | "bold"
+    | "italic"
+    | "link"
+    | "strike"
+    | "highlight"
+    | "code"
+    | "underline";
   attrs?: { href?: string };
 };
 
+export type NodeType =
+  | "doc"
+  | "paragraph"
+  | "heading"
+  | "bulletList"
+  | "orderedList"
+  | "listItem"
+  | "image"
+  | "blockquote"
+  | "codeBlock"
+  | "horizontalRule"
+  | "hardBreak"
+  | "text";
+
 export type Node = {
-  type:
-    | "paragraph"
-    | "heading"
-    | "bulletList"
-    | "orderedList"
-    | "listItem"
-    | "image"
-    | "blockquote"
-    | "codeBlock"
-    | "text";
+  type: NodeType;
   content?: Node[];
   text?: string;
   marks?: Mark[];
   attrs?: {
-    level?: number; // For headings (h1, h2, etc.)
-    src?: string; // For images
-    alt?: string; // For images
+    level?: number; // headings
+    src?: string; // images
+    alt?: string; // images
+    href?: string; // links
+    textAlign?: "left" | "center" | "right" | "justify";
+    start?: number; // ordered lists
+    language?: string; // code blocks
   };
+};
+
+/** What `editor.getJSON()` actually returns — a doc node, not a bare array. */
+export type TiptapDoc = {
+  type: "doc";
+  content: Node[];
 };
 
 export type Blog = {
@@ -35,8 +57,7 @@ export type Blog = {
       alt?: string;
       key?: string;
     };
-    mainImageBlobUrl?: string;
-    body?: Node[];
+    body?: TiptapDoc;
     conclusion?: Node[];
     links?: string[];
   };
@@ -45,16 +66,14 @@ export type Blog = {
 
 export type BlogContentProp = {
   title: string;
+  description?: string;
   tags?: string[];
   mainImage?: {
     url?: string;
     alt?: string;
     key?: string;
   };
-  mainImageBlobUrl?: string;
-  body?: {
-    content: Node[];
-  };
+  body?: TiptapDoc;
   conclusion?: Node[];
   links?: string[];
 };

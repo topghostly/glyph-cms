@@ -1,71 +1,58 @@
-import { Metadata, ResolvingMetadata } from "next";
-import PreviewPage from "./preview-page";
+import { Metadata } from "next";
+import ErrorPage from "@/components/external-post/error";
+import PostView from "./post-view";
+import { getPost } from "./get-post";
 
-// 1) declare the proper Props type for generateMetadata
-type GenerateMetadataProps = {
+export const revalidate = 60;
+
+type PageProps = {
   params: Promise<{ id: string }>;
-  // if you need searchParams, you can uncomment this:
-  // searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export async function generateMetadata(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  { params }: GenerateMetadataProps,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _parent: ResolvingMetadata
-): Promise<Metadata> {
-  try {
-    // 2) unwrap the promise
-    const { id } = await params;
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { id } = await params;
+  const post = await getPost(id);
 
-    const res = await fetch(`https://glyph-cms.vercel.app/api/blog/get-blog`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ _localID: id }),
-      cache: "no-store",
-    });
-
-    const result = await res.json();
-    if (!res.ok || !result.blog) {
-      return {
-        title: "Blog Not Found | Glyph",
-        description: "This blog post does not exist or has been removed.",
-      };
-    }
-
-    const content = JSON.parse(result.blog.content);
-    const title = content.content.title || "Untitled Blog";
-    const description =
-      content.content.description || "Read this insightful post on Glyph.";
-    const image =
-      content.content.mainImage?.url ||
-      `${process.env.NEXT_PUBLIC_BASE_URL}/default-og.png`;
-
+  if (!post) {
     return {
-      title: `${title} | Glyph`,
-      description,
-      openGraph: {
-        title,
-        description,
-        images: [{ url: image, width: 1200, height: 630, alt: title }],
-        type: "article",
-      },
-      twitter: {
-        card: "summary_large_image",
-        title,
-        description,
-        images: [image],
-      },
-    };
-  } catch (error) {
-    console.error("Metadata error", error);
-    return {
-      title: "Post | Glyph",
-      description: "Something went wrong trying to load the blog.",
+      title: "Blog Not Found | Glyph",
+      description: "This blog post does not exist or has been removed.",
     };
   }
+
+  const { content } = post;
+  const title = content.title || "Untitled Blog";
+  const description =
+    content.description || "Read this insightful post on Glyph.";
+  const image =
+    content.mainImage?.url ||
+    `${process.env.NEXT_PUBLIC_BASE_URL ?? ""}/default-og.png`;
+
+  return {
+    title: `${title} | Glyph`,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [{ url: image, width: 1200, height: 630, alt: title }],
+      type: "article",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+  };
 }
 
-export default function Page() {
-  return <PreviewPage />;
+export default async function Page({ params }: PageProps) {
+  const { id } = await params;
+  const post = await getPost(id);
+
+  if (!post) return <ErrorPage />;
+
+  return <PostView content={post.content} creator={post.creator} />;
 }

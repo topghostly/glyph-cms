@@ -33,7 +33,7 @@ export default function SignIn() {
             action={async () => {
               "use server";
               await signIn("google", {
-                redirectTo: "/verify",
+                redirectTo: "/",
               });
             }}
           >

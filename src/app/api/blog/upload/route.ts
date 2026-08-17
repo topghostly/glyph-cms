@@ -1,50 +1,30 @@
-import { NextRequest, NextResponse } from "next/server";
-import connectToDB from "@/lib/mongodb";
+import { NextResponse } from "next/server";
+import dbConnect from "@/lib/db-connect";
 import Blog from "@/models/blog";
+import { withAuth } from "@/lib/api-handler";
+import { blogUploadSchema } from "@/lib/schemas";
 
-export async function POST(req: NextRequest) {
-  try {
-    const { _localID, content, creator, link } = await req.json();
+export const POST = withAuth(blogUploadSchema, async (body, session) => {
+  await dbConnect();
 
-    // Validate input data
-    if (!_localID || !content || !creator || !link) {
-      return NextResponse.json(
-        { error: "A LocalId, content, and creator are required" },
-        { status: 400 }
-      );
-    }
+  const existing = await Blog.findOne({ _localID: body._localID })
+    .select("creator")
+    .lean<{ creator: string } | null>();
 
-    await connectToDB();
-
-    // Check if the email already exists
-    const existingBlog = await Blog.findOneAndUpdate(
-      { _localID },
-      { content },
-      { new: true }
-    );
-
-    if (existingBlog) {
-      console.log("The blog already exist");
-      return NextResponse.json(
-        { message: "Blog has been updated", blog: existingBlog },
-        { status: 201 }
-      );
-    }
-
-    // Otherwise create new user
-    console.log("Creating new blog");
-    const newBlog = new Blog({ _localID, content, creator, link });
-    await newBlog.save();
-
-    return NextResponse.json(
-      { message: "Blog created successfully", blog: newBlog },
-      { status: 201 }
-    );
-  } catch (e) {
-    console.error(e);
-    return NextResponse.json(
-      { error: "Failed to create blog" },
-      { status: 500 }
-    );
+  // Someone else already owns this _localID — refuse to overwrite.
+  if (existing && existing.creator !== session.user.id) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
-}
+
+  const blog = await Blog.findOneAndUpdate(
+    { _localID: body._localID },
+    {
+      content: body.content,
+      link: body.link,
+      creator: session.user.id,
+    },
+    { new: true, upsert: true, setDefaultsOnInsert: true }
+  ).lean();
+
+  return NextResponse.json({ message: "Saved", blog }, { status: 200 });
+});

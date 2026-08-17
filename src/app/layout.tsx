@@ -4,7 +4,6 @@ import localFont from "next/font/local";
 import { Toaster } from "@/components/ui/sonner";
 
 import "./globals.css";
-import { UserProvider } from "@/store/user-store";
 
 export const metadata: Metadata = {
   title: "Editor • Write, Edit & Preview",
@@ -37,7 +36,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${satoshi.className} antialiased`}>
-        <UserProvider>{children}</UserProvider>
+        {children}
         <Toaster />
       </body>
     </html>

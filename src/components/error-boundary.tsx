@@ -51,10 +51,7 @@ export class ErrorBoundary extends Component<
             Click the link below to go back — or go grab a coffee while we sort
             this out. ☕️
           </p>
-          <Link
-            href={"/verify"}
-            className="border px-3 py-2 rounded-md text-xs"
-          >
+          <Link href={"/"} className="border px-3 py-2 rounded-md text-xs">
             Back to editor
           </Link>
         </div>

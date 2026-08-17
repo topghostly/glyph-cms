@@ -3,10 +3,13 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import Image from "next/image";
 import { ImageMinus, ImageUp, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TextEditor } from "./components/text-editor";
 import { useCallback, useEffect, useState } from "react";
+
+const MAX_FILE_SIZE_MB = 3; // Maximum cover image size
 import { useDropzone } from "react-dropzone";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -16,8 +19,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useBlogStore } from "@/store/blog-store";
-import { Blog, Node } from "@/type/blog";
-import { useUser } from "@/store/user-store";
+import { Blog, TiptapDoc } from "@/type/blog";
 import { toast } from "sonner";
 
 export const Structure = () => {
@@ -26,10 +28,9 @@ export const Structure = () => {
   const activeBlog = useBlogStore((state) => state.activeBlog);
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
 
-  const { userInfo } = useUser(); // UserId from user context
-
   const [inputValue, setInputValue] = useState<string>("");
-  const [savedBlog, setSavedBlog] = useState<Node[]>([]);
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [savedBlog, setSavedBlog] = useState<TiptapDoc | null>(null);
   const [blog, setBlog] = useState<Blog>(
     activeBlog || {
       _localID: "",
@@ -42,7 +43,7 @@ export const Structure = () => {
           url: "",
         },
       },
-      creator: userInfo.userId ?? "Unknown",
+      creator: "",
     }
   );
 
@@ -60,18 +61,18 @@ export const Structure = () => {
     // scrollToTop();
   }, [activeBlog?._localID, activeBlog, blog._localID]);
 
+  // Debounced so a burst of keystrokes results in one localStorage write
+  // rather than one per character.
   useEffect(() => {
-    if (blog._localID) {
-      updateBlog(blog);
-    }
+    if (!blog._localID) return;
+    const t = setTimeout(() => updateBlog(blog), 500);
+    return () => clearTimeout(t);
   }, [blog, updateBlog]);
 
   useEffect(() => {
-    if (blog.content.body) {
-      setSavedBlog(blog.content.body);
-    } else {
-      setSavedBlog([]);
-    }
+    setSavedBlog(blog.content.body ?? null);
+    // Only reload editor content when switching posts, not on every edit.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [blog._localID]);
 
   const handleAddTags = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -97,40 +98,56 @@ export const Structure = () => {
     }));
   };
 
-  const MAX_FILE_SIZE_MB = 3; // Maximum image sizw
   /* GET MAIN IMAGE */
-  const onDrop = useCallback((acceptedFiles: File[]) => {
+  // Uploaded straight to S3 — storing the base64 data URI instead would
+  // blow the localStorage quota once a couple of drafts exist.
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
+    if (!file) return;
 
-    if (file) {
-      const fileSizeMB = file.size / (1024 * 1024);
+    if (file.size / (1024 * 1024) > MAX_FILE_SIZE_MB) {
+      toast(`🚫 File too large. Please upload an image under ${MAX_FILE_SIZE_MB}MB.`);
+      return;
+    }
 
-      if (fileSizeMB > MAX_FILE_SIZE_MB) {
-        toast("🚫 File too large. Please upload an image under 3MB.");
+    setUploadingCover(true);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+
+      const res = await fetch("/api/bucket/image-upload", {
+        method: "POST",
+        body: form,
+      });
+
+      if (!res.ok) {
+        const { error } = await res.json().catch(() => ({ error: null }));
+        toast(`❌ ${error ?? "Cover image upload failed."}`);
         return;
       }
 
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
+      const { data } = await res.json();
+      if (!data?.publicUrl) {
+        toast("❌ Upload returned no URL.");
+        return;
+      }
 
-      reader.onload = () => {
-        const base64String = reader.result as string;
-
-        setBlog((prevBlog) => ({
-          ...prevBlog,
-          content: {
-            ...prevBlog.content,
-            mainImage: {
-              url: base64String,
-              alt: prevBlog.content.mainImage?.alt || "",
-            },
+      setBlog((prevBlog) => ({
+        ...prevBlog,
+        content: {
+          ...prevBlog.content,
+          mainImage: {
+            url: data.publicUrl,
+            key: data.filename,
+            alt: prevBlog.content.mainImage?.alt || "",
           },
-        }));
-      };
-
-      reader.onerror = (error) => {
-        console.error("Error converting image to Base64:", error);
-      };
+        },
+      }));
+    } catch (err) {
+      console.error("Cover upload failed:", err);
+      toast("❌ Cover image upload failed.");
+    } finally {
+      setUploadingCover(false);
     }
   }, []);
 
@@ -145,17 +162,29 @@ export const Structure = () => {
   });
 
   /* REMOVE MAIN IMAGE */
-  const removeMainImage = () => {
+  const removeMainImage = async () => {
+    const key = blog.content.mainImage?.key;
+
     setBlog((prevBlog) => ({
       ...prevBlog,
       content: {
         ...prevBlog.content,
-        mainImage: {
-          url: "",
-          alt: "",
-        },
+        mainImage: { url: "", alt: "", key: undefined },
       },
     }));
+
+    // Reclaim the bucket object rather than orphaning it.
+    if (key) {
+      try {
+        await fetch("/api/bucket/delete-image", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ key }),
+        });
+      } catch (err) {
+        console.error("Failed to delete orphaned cover image", err);
+      }
+    }
   };
 
   return (
@@ -199,11 +228,12 @@ export const Structure = () => {
 
             {blog.content.mainImage?.url ? (
               <div className="w-full relative h-100">
-                <img
+                <Image
                   src={blog.content.mainImage.url}
-                  alt="new image"
-                  className="mx-auto rounded object-center object-cover w-full h-full"
-                  // fill
+                  alt={blog.content.mainImage.alt || "Cover image"}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 750px"
+                  className="mx-auto rounded object-center object-cover"
                 />
               </div>
             ) : (
@@ -212,10 +242,21 @@ export const Structure = () => {
                 <Card className="w-full aspect-video rounded overflow-hidden">
                   <CardContent className="grid place-content-center w-full h-full">
                     <div className="flex flex-col gap-2 justify-center items-center">
-                      <ImageUp size={30} color="#cccccc" strokeWidth={2} />
-                      <p className="text-[#8b8b8b] text-[10px]">
-                        3MB MAX SIZE.
-                      </p>
+                      {uploadingCover ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <p className="text-[#8b8b8b] text-[10px]">
+                            UPLOADING…
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <ImageUp size={30} color="#cccccc" strokeWidth={2} />
+                          <p className="text-[#8b8b8b] text-[10px]">
+                            {MAX_FILE_SIZE_MB}MB MAX SIZE.
+                          </p>
+                        </>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -259,15 +300,16 @@ export const Structure = () => {
           <Card className="rounded p-0 min-h-8 w-full">
             <CardContent className="flex flex-wrap gap-1.5 p-2">
               {(blog.content.tags || []).map((tag, index) => (
-                <TooltipProvider key={index}>
+                <TooltipProvider key={`${tag}-${index}`}>
                   <Tooltip>
-                    <TooltipTrigger>
-                      <Badge
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        aria-label={`Remove tag ${tag}`}
                         onClick={() => handleRemoveTag(index)}
-                        className="cursor-pointer"
                       >
-                        {tag}
-                      </Badge>
+                        <Badge className="cursor-pointer">{tag}</Badge>
+                      </button>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>Click to remove</p>
@@ -316,12 +358,12 @@ export const Structure = () => {
 
       {/* DESCRIPTION */}
       <div className="flex flex-col gap-4">
-        <Label htmlFor="title" className="text-[12px]">
+        <Label htmlFor="description" className="text-[12px]">
           Blog Description
         </Label>
         <Input
-          id="title"
-          name="title"
+          id="description"
+          name="description"
           placeholder="Beware that, when fighting monsters, you yourself do not become a monster... for when you gaze long into the abyss. The abyss gazes also into you."
           value={blog.content.description}
           onChange={(e) =>

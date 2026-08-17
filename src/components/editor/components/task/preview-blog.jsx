@@ -3,51 +3,26 @@
 import { useBlogStore } from "@/store/blog-store";
 import { WholeWord } from "lucide-react";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
-/** Define TypeScript types */
-// type Mark = {
-//   type: "bold" | "italic" | "link" | "strike" | "highlight" | "code";
-//   attrs?: { href?: string };
-// };
-
-// type NodeAttrs = {
-//   level?: number; // For headings
-//   src?: string; // For images
-//   alt?: string; // For images
-//   href?: string; // For links
-//   textAlign?: "left" | "center" | "right" | "justify"; // For text alignment
-//   start?: number; // For ordered lists
-// };
-
-// type Node = {
-//   type:
-//     | "paragraph"
-//     | "heading"
-//     | "bulletList"
-//     | "orderedList"
-//     | "listItem"
-//     | "image"
-//     | "blockquote"
-//     | "codeBlock"
-//     | "text";
-//   content?: Node[];
-//   text?: string;
-//   marks?: Mark[];
-//   attrs?: NodeAttrs;
-// };
+const alignClass = (node) => {
+  switch (node.attrs?.textAlign) {
+    case "center":
+      return "text-center";
+    case "right":
+      return "text-right";
+    case "justify":
+      return "text-justify";
+    default:
+      return "";
+  }
+};
 
 const RichTextRenderer = () => {
-  const [content, setContent] = useState([]);
   const activeBlog = useBlogStore((state) => state.activeBlog);
+  const content = activeBlog?.content;
 
-  useEffect(() => {
-    if (activeBlog?.content) {
-      setContent(activeBlog.content);
-    }
-  }, [activeBlog]);
-
-  if (!content?.body?.content.map.length)
+  if (!content?.body?.content?.length) {
     return (
       <div className="w-full h-full min-h-[60vh] flex items-center justify-center">
         <p className="text-accent flex gap-3">
@@ -56,32 +31,29 @@ const RichTextRenderer = () => {
         </p>
       </div>
     );
+  }
 
   return (
-    <div className="prose">
-      <div>
-        <h1 className="text-6xl">{content?.title}</h1>
-      </div>
-      <div>
-        <Image
-          src={content?.mainImage?.url}
-          alt={content?.mainImage?.alt || "Blog Image"}
-          style={{
-            width: "100%",
-            objectFit: "cover",
-            objectPosition: "center",
-          }}
-          className="my-4 rounded"
-          width={0}
-          height={0}
-        />
-      </div>
+    <div className="prose prose-invert max-w-none">
+      <h1 className="text-4xl">{content.title}</h1>
 
-      {content?.tags?.length > 0 && (
+      {content.mainImage?.url && (
+        <div className="w-full aspect-[16/10] relative my-6">
+          <Image
+            src={content.mainImage.url}
+            alt={content.mainImage.alt || "Blog image"}
+            fill
+            sizes="(max-width: 768px) 100vw, 750px"
+            className="rounded object-cover object-center"
+          />
+        </div>
+      )}
+
+      {content.tags?.length > 0 && (
         <div className="mb-4 flex flex-wrap gap-2">
           {content.tags.map((tag, index) => (
             <span
-              key={index}
+              key={`${tag}-${index}`}
               className="bg-gray-200 text-gray-800 px-2 py-0.5 rounded-full text-[10px]"
             >
               {tag}
@@ -90,7 +62,7 @@ const RichTextRenderer = () => {
         </div>
       )}
 
-      {content?.body?.content.map((node, index) => renderNode(node, index))}
+      {content.body.content.map((node, index) => renderNode(node, index))}
     </div>
   );
 };
@@ -99,60 +71,84 @@ export const renderNode = (node, index) => {
   switch (node.type) {
     case "paragraph":
       if (!node.content) return <br key={index} />;
-      return <p key={index}>{renderText(node)}</p>;
+      return (
+        <p key={index} className={alignClass(node)}>
+          {renderText(node)}
+        </p>
+      );
 
-    case "heading":
-      const HeadingTag = `h${node.attrs?.level}`;
-      return <HeadingTag key={index}>{renderText(node)}</HeadingTag>;
+    case "heading": {
+      const level = node.attrs?.level ?? 2;
+      const HeadingTag = `h${level}`;
+      return (
+        <HeadingTag key={index} className={alignClass(node)}>
+          {renderText(node)}
+        </HeadingTag>
+      );
+    }
 
     case "bulletList":
       return (
-        <ul key={index} className="ml-8 list-decimal">
-          {node.content?.map(renderListItem)}
+        <ul key={index} className="ml-8 list-disc">
+          {node.content?.map((child, i) => renderNode(child, i))}
         </ul>
       );
 
     case "orderedList":
       return (
-        <ol key={index} className="ml-8 list-disc">
-          {node.content?.map(renderListItem)}
+        <ol
+          key={index}
+          className="ml-8 list-decimal"
+          start={node.attrs?.start ?? 1}
+        >
+          {node.content?.map((child, i) => renderNode(child, i))}
         </ol>
       );
 
+    // List items hold block nodes (usually paragraphs), so recurse rather
+    // than assuming their children are inline text.
     case "listItem":
-      return <li key={index}>{node.content?.map(renderText)}</li>;
+      return (
+        <li key={index}>{node.content?.map((child, i) => renderNode(child, i))}</li>
+      );
 
     case "image":
       return (
-        <div className="w-full aspect-[16/10] relative">
+        <div key={index} className="w-full aspect-[16/10] relative my-6">
           <Image
-            key={index}
             src={node.attrs?.src}
-            alt={node.attrs?.alt || "no alt image"}
-            style={{
-              objectFit: "cover",
-              objectPosition: "center",
-            }}
-            className="my-6 rounded-sm"
+            alt={node.attrs?.alt || ""}
             fill
+            sizes="(max-width: 768px) 100vw, 750px"
+            className="rounded-sm object-cover object-center"
           />
         </div>
       );
 
     case "blockquote":
-      return <blockquote key={index}>{renderText(node)}</blockquote>;
+      return (
+        <blockquote key={index} className="border-l-4 pl-4 italic">
+          {node.content?.map((child, i) => renderNode(child, i))}
+        </blockquote>
+      );
 
-    case "codeBlock":
+    case "codeBlock": {
       const code = node.content?.map((n) => n.text).join("\n") ?? "";
-
       return (
         <pre
           key={index}
-          className="bg-gray-100/30 border border-gray-200 text-[#00095c] p-4 rounded-sm overflow-x-auto my-4"
+          className="bg-gray-900 text-white p-4 rounded-sm overflow-x-auto my-4"
         >
           <code>{code}</code>
         </pre>
       );
+    }
+
+    case "horizontalRule":
+      return <hr key={index} className="my-8 border-gray-300" />;
+
+    case "hardBreak":
+      return <br key={index} />;
 
     default:
       return null;
@@ -161,269 +157,59 @@ export const renderNode = (node, index) => {
 
 export const renderText = (node) => {
   if (!node.content) return null;
+
   return node.content.map((textNode, index) => {
-    if (textNode.type === "text") {
-      let textElement = textNode.text || "";
-      if (textNode.marks) {
-        textNode.marks.forEach((mark) => {
-          switch (mark.type) {
-            case "bold":
-              textElement = <strong key={index}>{textElement}</strong>;
-              break;
-            case "italic":
-              textElement = <em key={index}>{textElement}</em>;
-              break;
-            case "strike":
-              textElement = <del key={index}>{textElement}</del>;
-              break;
-            case "highlight":
-              textElement = <mark key={index}>{textElement}</mark>;
-              break;
-            case "code":
-              textElement = (
-                <code key={index} className="bg-gray-200 px-1 rounded">
-                  {textElement}
-                </code>
-              );
-              break;
-            case "link":
-              textElement = (
-                <a
-                  key={index}
-                  href={mark.attrs?.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-500 underline"
-                >
-                  {textElement}
-                </a>
-              );
-              break;
-          }
-        });
+    if (textNode.type === "hardBreak") return <br key={index} />;
+    if (textNode.type !== "text") return null;
+
+    let element = textNode.text || "";
+
+    // Marks nest, so each wrap needs its own key to stay stable.
+    (textNode.marks ?? []).forEach((mark, markIndex) => {
+      const key = `${index}-${markIndex}`;
+      switch (mark.type) {
+        case "bold":
+          element = <strong key={key}>{element}</strong>;
+          break;
+        case "italic":
+          element = <em key={key}>{element}</em>;
+          break;
+        case "underline":
+          element = <u key={key}>{element}</u>;
+          break;
+        case "strike":
+          element = <del key={key}>{element}</del>;
+          break;
+        case "highlight":
+          element = <mark key={key}>{element}</mark>;
+          break;
+        case "code":
+          element = (
+            <code key={key} className="bg-gray-200 text-gray-900 px-1 rounded">
+              {element}
+            </code>
+          );
+          break;
+        case "link":
+          element = (
+            <a
+              key={key}
+              href={mark.attrs?.href}
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+              className="text-blue-500 underline"
+            >
+              {element}
+            </a>
+          );
+          break;
+        default:
+          break;
       }
-      return <React.Fragment key={index}>{textElement}</React.Fragment>;
-    }
-    if (textNode.type === "hardBreak") {
-      return <br key={index} />;
-    }
-    return null;
+    });
+
+    return <React.Fragment key={index}>{element}</React.Fragment>;
   });
 };
 
-export const renderListItem = (node, index) => {
-  return <li key={index}>{node.content?.map(renderText)}</li>;
-};
-
 export default RichTextRenderer;
-// "use client";
-
-// import { useBlogStore } from "@/store/blog-store";
-// import { WholeWord } from "lucide-react";
-// import Image from "next/image";
-// import React, { useEffect, useState } from "react";
-
-// /** Define TypeScript types */
-// type Mark = {
-//   type: "bold" | "italic" | "link" | "strike" | "highlight" | "code";
-//   attrs?: { href?: string };
-// };
-
-// type NodeAttrs = {
-//   level?: number; // For headings
-//   src?: string; // For images
-//   alt?: string; // For images
-//   href?: string; // For links
-//   textAlign?: "left" | "center" | "right" | "justify"; // For text alignment
-//   start?: number; // For ordered lists
-// };
-
-// type Node = {
-//   type:
-//     | "paragraph"
-//     | "heading"
-//     | "bulletList"
-//     | "orderedList"
-//     | "listItem"
-//     | "image"
-//     | "blockquote"
-//     | "codeBlock"
-//     | "text";
-//   content?: Node[];
-//   text?: string;
-//   marks?: Mark[];
-//   attrs?: NodeAttrs;
-// };
-
-// const RichTextRenderer: React.FC = () => {
-//   const [content, setContent] = useState<Node[]>([]);
-//   const activeBlog = useBlogStore((state) => state.activeBlog);
-
-//   useEffect(() => {
-//     if (activeBlog?.content) {
-//       setContent(activeBlog.content);
-//     }
-//   }, [activeBlog]);
-
-//   if (!content?.body?.content.map.length)
-//     return (
-//       <div className="w-full h-full min-h-[60vh] flex items-center justify-center">
-//         <p className="text-accent flex gap-3">
-//           <WholeWord />
-//           Add content to body
-//         </p>
-//       </div>
-//     );
-
-//   return (
-//     <div className="prose">
-//       <div>
-//         <h1 className="text-6xl">{content?.title}</h1>
-//       </div>
-//       <div>
-//         <Image
-//           src={content?.mainImage?.url}
-//           alt={content?.mainImage?.alt || "Blog Image"}
-//           style={{
-//             width: "100%",
-//             objectFit: "cover",
-//             objectPosition: "center",
-//           }}
-//           className="my-4 rounded"
-//           width={0}
-//           height={0}
-//         />
-//       </div>
-
-//       {content?.tags?.length > 0 && (
-//         <div className="mb-4 flex flex-wrap gap-2">
-//           {content.tags.map((tag, index) => (
-//             <span
-//               key={index}
-//               className="bg-gray-200 text-gray-800 px-2 py-0.5 rounded-full text-[10px]"
-//             >
-//               {tag}
-//             </span>
-//           ))}
-//         </div>
-//       )}
-
-//       {content?.body?.content.map((node, index) => renderNode(node, index))}
-//     </div>
-//   );
-// };
-
-// export const renderNode = (node: Node, index: number): React.ReactNode => {
-//   switch (node.type) {
-//     case "paragraph":
-//       if (!node.content) return <br key={index} />;
-//       return <p key={index}>{renderText(node)}</p>;
-
-//     case "heading":
-//       const HeadingTag = `h${node.attrs?.level}` as keyof JSX.IntrinsicElements;
-//       return <HeadingTag key={index}>{renderText(node)}</HeadingTag>;
-
-//     case "bulletList":
-//       return (
-//         <ul key={index} className="ml-8 list-decimal">
-//           {node.content?.map(renderListItem)}
-//         </ul>
-//       );
-
-//     case "orderedList":
-//       return (
-//         <ol key={index} className="ml-8 list-disc">
-//           {node.content?.map(renderListItem)}
-//         </ol>
-//       );
-
-//     case "listItem":
-//       return <li key={index}>{node.content?.map(renderText)}</li>;
-
-//     case "image":
-//       return (
-//         <Image
-//           key={index}
-//           src={node.attrs?.src}
-//           alt={node.attrs?.alt || "no alt image"}
-//           style={{
-//             width: "100%",
-//             height: "50vh",
-//             objectFit: "cover",
-//             objectPosition: "center",
-//           }}
-//           className="my-10 rounded-2xl"
-//           width={0}
-//           height={0}
-//         />
-//       );
-
-//     case "blockquote":
-//       return <blockquote key={index}>{renderText(node)}</blockquote>;
-
-//     case "codeBlock":
-//       return (
-//         <pre key={index} className="bg-gray-900 text-white p-4 rounded">
-//           <code>{node.content?.map(renderText)}</code>
-//         </pre>
-//       );
-
-//     default:
-//       return null;
-//   }
-// };
-
-// export const renderText = (node: Node): JSX.Element[] | null => {
-//   if (!node.content) return null;
-//   return node.content.map((textNode, index) => {
-//     if (textNode.type === "text") {
-//       let textElement: JSX.Element | string = textNode.text || "";
-//       if (textNode.marks) {
-//         textNode.marks.forEach((mark) => {
-//           switch (mark.type) {
-//             case "bold":
-//               textElement = <strong key={index}>{textElement}</strong>;
-//               break;
-//             case "italic":
-//               textElement = <em key={index}>{textElement}</em>;
-//               break;
-//             case "strike":
-//               textElement = <del key={index}>{textElement}</del>;
-//               break;
-//             case "highlight":
-//               textElement = <mark key={index}>{textElement}</mark>;
-//               break;
-//             case "code":
-//               textElement = (
-//                 <code key={index} className="bg-gray-200 px-1 rounded">
-//                   {textElement}
-//                 </code>
-//               );
-//               break;
-//             case "link":
-//               textElement = (
-//                 <a
-//                   key={index}
-//                   href={mark.attrs?.href}
-//                   target="_blank"
-//                   rel="noopener noreferrer"
-//                   className="text-blue-500 underline"
-//                 >
-//                   {textElement}
-//                 </a>
-//               );
-//               break;
-//           }
-//         });
-//       }
-//       return <React.Fragment key={index}>{textElement}</React.Fragment>;
-//     }
-//     return null;
-//   });
-// };
-
-// export const renderListItem = (node: Node, index: number): React.ReactNode => {
-//   return <li key={index}>{node.content?.map(renderText)}</li>;
-// };
-
-// export default RichTextRenderer;

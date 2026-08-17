@@ -2,7 +2,6 @@
 
 import { Separator } from "../ui/separator";
 import { Topbar } from "./components/top-bar";
-import { AuthProvider } from "@/store/auth-store";
 import { BlogStore } from "@/store/blog-store";
 import { ArticleLayers } from "./components/subject-layers";
 import { ListLayers } from "./components/list-layers";
@@ -11,17 +10,13 @@ import { Session } from "next-auth";
 import { useEffect, useState } from "react";
 import { MonitorCheck } from "lucide-react";
 import HandleBlogSync from "./components/handle-sync-blog";
-import { useUser } from "@/store/user-store";
-import { useRouter } from "next/navigation";
+
 export interface EditorInterface {
   session: Session;
 }
 
 export const Editor: React.FC<EditorInterface> = ({ session }) => {
-  const { userInfo } = useUser();
   const [isScreenTooSmall, setIsScreenTooSmall] = useState(true);
-
-  const router = useRouter();
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -32,10 +27,6 @@ export const Editor: React.FC<EditorInterface> = ({ session }) => {
     window.addEventListener("resize", checkScreenSize);
 
     return () => window.removeEventListener("resize", checkScreenSize);
-  }, []);
-
-  useEffect(() => {
-    if (userInfo.username === "Unknown User") return router.replace("/verify");
   }, []);
 
   if (isScreenTooSmall) {
@@ -51,28 +42,26 @@ export const Editor: React.FC<EditorInterface> = ({ session }) => {
   }
 
   return (
-    <AuthProvider>
-      <BlogStore.Provider
-        initialValue={{
-          isSearching: false,
-          blogs: [],
-        }}
-      >
-        <main className="h-screen w-full relative grid grid-rows-[3.75rem_0.5px_1fr]">
-          <HandleBlogSync />
-          <Topbar />
-          <Separator className="h-[0.2px] bg-accent" />
-          <div className="flex w-full min-h-full relative px-3 max-w-[1440px] mx-auto overflow-x-hidden">
-            <Separator orientation="vertical" />
-            <ArticleLayers />
-            <Separator orientation="vertical" />
-            <ListLayers />
-            <Separator orientation="vertical" />
-            <ActiveTask session={session} />
-            <Separator orientation="vertical" />
-          </div>
-        </main>
-      </BlogStore.Provider>
-    </AuthProvider>
+    <BlogStore.Provider
+      initialValue={{
+        isSearching: false,
+        blogs: [],
+      }}
+    >
+      <main className="h-screen w-full relative grid grid-rows-[3.75rem_0.5px_1fr]">
+        <HandleBlogSync />
+        <Topbar session={session} />
+        <Separator className="h-[0.2px] bg-accent" />
+        <div className="flex w-full min-h-full relative px-3 max-w-[1440px] mx-auto overflow-x-hidden">
+          <Separator orientation="vertical" />
+          <ArticleLayers />
+          <Separator orientation="vertical" />
+          <ListLayers session={session} />
+          <Separator orientation="vertical" />
+          <ActiveTask session={session} />
+          <Separator orientation="vertical" />
+        </div>
+      </main>
+    </BlogStore.Provider>
   );
 };
