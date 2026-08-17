@@ -6,12 +6,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
-// import { useAuth } from "@/store/auth-store";
+import { GoogleSignInButton } from "./google-sign-in-button";
 
 export default function SignIn() {
-  //   const { setSession } = useAuth();
   return (
     <div className="max-w-screen max-h-screen h-screen overflow-hidden flex items-center justify-center">
       <Card className="max-w-100 w-[90%] h-fit flex flex-col gap-2">
@@ -32,24 +30,12 @@ export default function SignIn() {
           <form
             action={async () => {
               "use server";
-              await signIn("google", {
-                redirectTo: "/",
-              });
+              await signIn("google", { redirectTo: "/" });
             }}
           >
-            <Button
-              variant={"outline"}
-              type="submit"
-              className="w-full cursor-pointer"
-            >
-              <Image
-                src={"/images/svg/google.svg"}
-                alt="glyph logo"
-                width={18}
-                height={18}
-              />
-              Signin with Google
-            </Button>
+            {/* useFormStatus only reports on the form it is rendered inside,
+                so the button has to be its own client component. */}
+            <GoogleSignInButton />
           </form>
         </CardContent>
       </Card>

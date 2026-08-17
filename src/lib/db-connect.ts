@@ -2,6 +2,10 @@ import mongoose from "mongoose";
 
 const MONGODB = process.env.MONGODB;
 
+// The connection string carries no database path, so without this mongoose
+// silently falls back to "test". Set explicitly, overridable per environment.
+const DB_NAME = process.env.MONGODB_DB || "glyph_db";
+
 declare global {
   // eslint-disable-next-line no-var
   var _mongoose:
@@ -21,7 +25,10 @@ export default async function dbConnect() {
   if (cached.conn) return cached.conn;
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB, { bufferCommands: false });
+    cached.promise = mongoose.connect(MONGODB, {
+      dbName: DB_NAME,
+      bufferCommands: false,
+    });
   }
 
   try {
