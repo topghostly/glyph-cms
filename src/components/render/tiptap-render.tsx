@@ -1,11 +1,17 @@
-"use client";
-
-import { useBlogStore } from "@/store/blog-store";
-import { WholeWord } from "lucide-react";
-import Image from "next/image";
 import React from "react";
+import Image from "next/image";
+import { Node } from "@/type/blog";
 
-const alignClass = (node) => {
+/**
+ * Pure Tiptap-JSON -> JSX renderer.
+ *
+ * Deliberately has NO "use client" directive: it holds no state and no
+ * hooks, so both the server-rendered public post page and the client-side
+ * editor preview import it. Adding a directive here would make the public
+ * page fall back to client rendering and lose its SEO value.
+ */
+
+const alignClass = (node: Node): string => {
   switch (node.attrs?.textAlign) {
     case "center":
       return "text-center";
@@ -18,56 +24,7 @@ const alignClass = (node) => {
   }
 };
 
-const RichTextRenderer = () => {
-  const activeBlog = useBlogStore((state) => state.activeBlog);
-  const content = activeBlog?.content;
-
-  if (!content?.body?.content?.length) {
-    return (
-      <div className="w-full h-full min-h-[60vh] flex items-center justify-center">
-        <p className="text-accent flex gap-3">
-          <WholeWord />
-          Add content to body
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="prose prose-invert max-w-none">
-      <h1 className="text-4xl">{content.title}</h1>
-
-      {content.mainImage?.url && (
-        <div className="w-full aspect-[16/10] relative my-6">
-          <Image
-            src={content.mainImage.url}
-            alt={content.mainImage.alt || "Blog image"}
-            fill
-            sizes="(max-width: 768px) 100vw, 750px"
-            className="rounded object-cover object-center"
-          />
-        </div>
-      )}
-
-      {content.tags?.length > 0 && (
-        <div className="mb-4 flex flex-wrap gap-2">
-          {content.tags.map((tag, index) => (
-            <span
-              key={`${tag}-${index}`}
-              className="bg-gray-200 text-gray-800 px-2 py-0.5 rounded-full text-[10px]"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {content.body.content.map((node, index) => renderNode(node, index))}
-    </div>
-  );
-};
-
-export const renderNode = (node, index) => {
+export const renderNode = (node: Node, index: number): React.ReactNode => {
   switch (node.type) {
     case "paragraph":
       if (!node.content) return <br key={index} />;
@@ -79,7 +36,7 @@ export const renderNode = (node, index) => {
 
     case "heading": {
       const level = node.attrs?.level ?? 2;
-      const HeadingTag = `h${level}`;
+      const HeadingTag = `h${level}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
       return (
         <HeadingTag key={index} className={alignClass(node)}>
           {renderText(node)}
@@ -105,21 +62,24 @@ export const renderNode = (node, index) => {
         </ol>
       );
 
-    // List items hold block nodes (usually paragraphs), so recurse rather
-    // than assuming their children are inline text.
+    // List items contain block nodes (usually paragraphs), so recurse
+    // rather than assuming their children are inline text.
     case "listItem":
       return (
-        <li key={index}>{node.content?.map((child, i) => renderNode(child, i))}</li>
+        <li key={index}>
+          {node.content?.map((child, i) => renderNode(child, i))}
+        </li>
       );
 
     case "image":
+      if (!node.attrs?.src) return null;
       return (
         <div key={index} className="w-full aspect-[16/10] relative my-6">
           <Image
-            src={node.attrs?.src}
-            alt={node.attrs?.alt || ""}
+            src={node.attrs.src}
+            alt={node.attrs.alt || ""}
             fill
-            sizes="(max-width: 768px) 100vw, 750px"
+            sizes="(max-width: 768px) 100vw, 850px"
             className="rounded-sm object-cover object-center"
           />
         </div>
@@ -155,16 +115,16 @@ export const renderNode = (node, index) => {
   }
 };
 
-export const renderText = (node) => {
+export const renderText = (node: Node): React.ReactNode => {
   if (!node.content) return null;
 
   return node.content.map((textNode, index) => {
     if (textNode.type === "hardBreak") return <br key={index} />;
     if (textNode.type !== "text") return null;
 
-    let element = textNode.text || "";
+    let element: React.ReactNode = textNode.text || "";
 
-    // Marks nest, so each wrap needs its own key to stay stable.
+    // Marks nest, so each wrapper needs its own stable key.
     (textNode.marks ?? []).forEach((mark, markIndex) => {
       const key = `${index}-${markIndex}`;
       switch (mark.type) {
@@ -211,5 +171,3 @@ export const renderText = (node) => {
     return <React.Fragment key={index}>{element}</React.Fragment>;
   });
 };
-
-export default RichTextRenderer;

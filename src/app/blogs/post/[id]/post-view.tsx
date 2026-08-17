@@ -1,4 +1,4 @@
-import { renderNode } from "@/components/editor/components/task/preview-blog";
+import { renderNode } from "@/components/render/tiptap-render";
 import CreatorBoard from "@/components/preview/creator-board";
 import AdvertBoard from "@/components/preview/advert-board";
 import Image from "next/image";
