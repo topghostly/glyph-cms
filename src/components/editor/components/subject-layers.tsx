@@ -2,7 +2,9 @@ import { cn } from "@/lib/utils";
 import { useBlogStore } from "@/store/blog-store";
 import { Newspaper } from "lucide-react";
 
-export const ArticleLayers: React.FC = () => {
+export const ArticleLayers: React.FC<{ className?: string }> = ({
+  className,
+}) => {
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
   const setListMode = useBlogStore((state) => state.setListMode);
   const listMode = useBlogStore((state) => state.listMode);
@@ -21,7 +23,12 @@ export const ArticleLayers: React.FC = () => {
     // },
   ];
   return (
-    <div className="flex flex-col basis-[200px] shrink-0 overflow-y-scroll relative scrollbar-h pt-5 gap-5 pr-1 pl-2">
+    <div
+      className={cn(
+        "flex flex-col basis-[200px] shrink-0 overflow-y-scroll relative scrollbar-h pt-5 gap-5 pr-1 pl-2",
+        className
+      )}
+    >
       <div>
         <p className="font-bold text-[14px]">Articles</p>
       </div>

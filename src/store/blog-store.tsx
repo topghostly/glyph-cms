@@ -53,6 +53,10 @@ const getStore = (initialState: { blogs: Blog[]; isSearching: false }) => {
         setListMode: (mode: "all" | "category") => {
           set(() => ({ listMode: mode }));
         },
+        isSyncing: false,
+        setIsSyncing: (syncing: boolean) => {
+          set(() => ({ isSyncing: syncing }));
+        },
       }),
       { name: "local-blogs", storage: createJSONStorage(() => localStorage) }
     )

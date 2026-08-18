@@ -1,43 +1,22 @@
-import { NextRequest, NextResponse } from "next/server";
-import connectToDB from "@/lib/mongodb";
+import { NextResponse } from "next/server";
+import dbConnect from "@/lib/db-connect";
 import Blog from "@/models/blog";
-import User from "@/models/user";
-import { setCorsHeaders, handleOptionsRequest } from "@/util/cors";
+import { withAuth } from "@/lib/api-handler";
+import { listBlogsSchema } from "@/lib/schemas";
 
-export async function POST(req: NextRequest) {
-  try {
-    const { userId } = await req.json();
+/**
+ * Lists the signed-in author's own posts. The user id comes from the
+ * session — it is never accepted from the request body, and there are no
+ * open CORS headers.
+ */
+export const POST = withAuth(listBlogsSchema, async (body, session) => {
+  await dbConnect();
 
-    if (!userId) {
-      return NextResponse.json({ error: "Invalid UserID" }, { status: 400 });
-    }
+  const blogs = await Blog.find({ creator: session.user.id })
+    .sort({ updatedAt: -1 })
+    .limit(body.limit)
+    .select("_localID content link updatedAt")
+    .lean();
 
-    await connectToDB();
-
-    const validUser = await User.findById(userId);
-
-    if (!validUser) {
-      const responce = NextResponse.json(
-        { mssg: "User not found" },
-        { status: 404 }
-      );
-      return setCorsHeaders(responce);
-    }
-
-    const blogs = await Blog.find({ creator: userId });
-
-    const responce = NextResponse.json({ blogs }, { status: 200 });
-    return setCorsHeaders(responce);
-  } catch (error) {
-    console.error("Error fetching user blogs:", error);
-    const responce = NextResponse.json(
-      { error: "Failed to fetch blogs" },
-      { status: 500 }
-    );
-    return setCorsHeaders(responce);
-  }
-}
-
-export async function OPTIONS(req: NextRequest) {
-  return handleOptionsRequest(req);
-}
+  return NextResponse.json({ blogs }, { status: 200 });
+});

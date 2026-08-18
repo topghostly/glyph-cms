@@ -1,16 +1,32 @@
 import { Node } from "@/type/blog";
-import { extractS3Key } from "./get-s3-key";
 
+const BUCKET_HOST = `${process.env.NEXT_PUBLIC_AWS_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_AWS_REGION}.amazonaws.com`;
+
+/**
+ * Collects S3 object keys for images in a Tiptap document.
+ * Data URIs, relative paths and third-party URLs are ignored — only
+ * objects we actually own in the bucket are eligible for cleanup.
+ */
 export function listImageKeys(doc: Node): string[] {
   const keys: string[] = [];
+
   const recurse = (node: Node) => {
-    if (node.type === "image" && node.attrs?.src) {
-      keys.push(extractS3Key(node.attrs.src));
+    const src = node.attrs?.src;
+
+    if (node.type === "image" && src) {
+      try {
+        const url = new URL(src);
+        if (url.hostname === BUCKET_HOST) {
+          keys.push(url.pathname.replace(/^\//, ""));
+        }
+      } catch {
+        // data: URI or relative path — not a bucket object.
+      }
     }
-    if (Array.isArray(node.content)) {
-      node.content.forEach(recurse);
-    }
+
+    if (Array.isArray(node.content)) node.content.forEach(recurse);
   };
+
   recurse(doc);
   return keys;
 }

@@ -1,6 +1,3 @@
-"use client";
-
-// import { useAuth } from "@/store/auth-store";
 import Image from "next/image";
 
 export default function CreatorBoard({
@@ -10,23 +7,28 @@ export default function CreatorBoard({
   fullname?: string;
   image?: string;
 }) {
+  const displayName = fullname || "Anonymous";
+
   return (
-    <div className="w-full h-fit p-5 bg-white border-1 rounded-md border-gray-200">
-      <p className="text-[#334155] text-sm font-bold mb-2">Written by</p>
-      <div className="flex gap-2">
+    <div className="w-full h-fit p-5 bg-white rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.06),0_8px_16px_-8px_rgba(0,0,0,0.1)]">
+      <p className="text-gray-900 text-sm font-semibold mb-3">Written by</p>
+      <div className="flex items-center gap-3">
         <Image
-          src={image ?? "/images/png/fill-image-2.png"}
-          // src={session?.user?.image ?? "/images/png/web-icon.png"}
-          alt="writer image"
+          src={image || "/images/png/fill-image-2.png"}
+          alt={displayName}
           width={40}
           height={40}
-          className="rounded-full"
+          className="rounded-full object-cover"
         />
-        <div>
-          <p className="text-lg text-[14px] font-bold truncate w-[130px]">
-            {fullname ?? "Anonymous"}
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-gray-900 truncate">
+            {displayName}
           </p>
-          <p className="text-xs">@{fullname!.replace(/\s+/g, "")}</p>
+          {fullname && (
+            <p className="text-xs text-gray-500 truncate">
+              @{fullname.replace(/\s+/g, "").toLowerCase()}
+            </p>
+          )}
         </div>
       </div>
     </div>

@@ -1,50 +1,39 @@
-import { NextRequest, NextResponse } from "next/server";
-import connectToDB from "@/lib/mongodb";
+import { NextResponse } from "next/server";
+import dbConnect from "@/lib/db-connect";
 import Blog from "@/models/blog";
 import User from "@/models/user";
+import { withValidation } from "@/lib/api-handler";
+import { localIdSchema } from "@/lib/schemas";
 
-export async function POST(req: NextRequest) {
-  try {
-    const { _localID } = await req.json();
+/**
+ * Intentionally public — this backs the public permalink page.
+ * Returns only the creator's display fields, never their email.
+ */
+export const POST = withValidation(localIdSchema, async (body) => {
+  await dbConnect();
 
-    if (!_localID) {
-      return NextResponse.json(
-        { error: "Local ID is required" },
-        { status: 400 }
-      );
-    }
+  const blog = await Blog.findOne({ _localID: body._localID }).lean<{
+    _localID: string;
+    content: string;
+    creator: string;
+    link: string;
+  } | null>();
 
-    await connectToDB();
-
-    const blog = await Blog.findOne({ _localID });
-
-    if (!blog) {
-      return NextResponse.json({ error: "Blog not found" }, { status: 404 });
-    }
-
-    const creator = await User.findById(blog.creator);
-
-    if (!creator) {
-      return NextResponse.json({ error: "Creator not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(
-      {
-        blog,
-        creator: {
-          _id: creator._id,
-          email: creator.email,
-          fullname: creator.fullname,
-          image: creator.image,
-        },
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("Error fetching blog and creator:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch blog and creator" },
-      { status: 500 }
-    );
+  if (!blog) {
+    return NextResponse.json({ error: "Blog not found" }, { status: 404 });
   }
-}
+
+  const creator = await User.findById(blog.creator)
+    .select("fullname image")
+    .lean<{ fullname: string; image: string } | null>();
+
+  return NextResponse.json(
+    {
+      blog,
+      creator: creator
+        ? { fullname: creator.fullname, image: creator.image }
+        : null,
+    },
+    { status: 200 }
+  );
+});

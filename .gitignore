@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# foglamp (contains edit token — keep private)
+.foglamp/
+
+# local planning docs (untracked)
+docs/superpowers/
+
+# committed template (no real values)
+!.env.example

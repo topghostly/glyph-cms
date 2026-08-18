@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -141,6 +142,16 @@
   .padding-x {
     @apply px-5 md:px-10;
   }
+}
+
+/* Tiptap placeholder (@tiptap/extension-placeholder): renders via CSS only,
+   never part of the document, so it can't leak into saved content. */
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: rgba(255, 255, 255, 0.35);
 }
 body {
   height: 100%;

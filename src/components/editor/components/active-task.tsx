@@ -1,13 +1,27 @@
 import { Separator } from "@/components/ui/separator";
-import React, { useEffect } from "react";
+import React from "react";
+import dynamic from "next/dynamic";
 import { Structure } from "./task/structure";
-import { Ellipsis, Plus, UserRoundPen, ExternalLink } from "lucide-react";
+import {
+  ChevronLeft,
+  Ellipsis,
+  Plus,
+  UserRoundPen,
+  ExternalLink,
+} from "lucide-react";
 import { StartBlog } from "./task/start-blog";
 import { useBlogStore } from "@/store/blog-store";
 import { EditorInterface } from "../Editor";
-import { useAuth } from "@/store/auth-store";
-import RichTextRenderer from "./task/preview-blog";
-import CodePreview from "./task/code-preview";
+import { cn } from "@/lib/utils";
+
+// Only rendered when their tab is selected — keep them out of the
+// initial editor chunk.
+const RichTextRenderer = dynamic(() => import("./task/preview-blog"), {
+  ssr: false,
+});
+const CodePreview = dynamic(() => import("./task/code-preview"), {
+  ssr: false,
+});
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,23 +31,39 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 
-export const ActiveTask: React.FC<EditorInterface> = ({ session }) => {
+export const ActiveTask: React.FC<
+  EditorInterface & { className?: string }
+> = ({ className }) => {
   const activeTask = useBlogStore((state) => state.activeTask);
   const setActiveBlog = useBlogStore((state) => state.setActiveBlog);
   const setActiveTask = useBlogStore((state) => state.setActiveTask);
   const activeBlog = useBlogStore((state) => state.activeBlog);
 
-  const { updateSession } = useAuth();
-
-  useEffect(() => {
-    updateSession(session);
-  });
-
   return (
-    <div className="w-full h-full overflow-y-scroll relative scrollbar-h">
-      <div className="h-[50px] gap-3 px-3 flex items-center justify-end text-white/80 cursor-pointer">
+    <div
+      className={cn(
+        "w-full h-full overflow-y-scroll relative scrollbar-h",
+        className
+      )}
+    >
+      <div className="h-[50px] gap-3 px-3 flex items-center justify-between lg:justify-end text-white/80">
+        {activeBlog ? (
+          <button
+            type="button"
+            onClick={() => {
+              setActiveBlog(null);
+              setActiveTask(null);
+            }}
+            className="lg:hidden flex items-center gap-0.5 text-[13px] cursor-pointer -ml-2 pl-1 pr-2 py-1 rounded hover:bg-accent"
+          >
+            <ChevronLeft size={18} />
+            Posts
+          </button>
+        ) : (
+          <span />
+        )}
         {activeBlog && (
-          <>
+          <div className="flex items-center gap-3 cursor-pointer">
             <div className="w-7 h-7 grid place-content-center rounded hover:bg-accent">
               <DropdownMenu>
                 <DropdownMenuTrigger className="outline-none">
@@ -61,7 +91,9 @@ export const ActiveTask: React.FC<EditorInterface> = ({ session }) => {
                       <ExternalLink />
                       <span>Share Blog</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setActiveTask("structure")}
+                    >
                       <UserRoundPen />
                       <span>Edit Blog</span>
                     </DropdownMenuItem>
@@ -69,7 +101,7 @@ export const ActiveTask: React.FC<EditorInterface> = ({ session }) => {
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            <div className="w-7 h-7 grid place-content-center rounded hover:bg-accent">
+            <div className="hidden lg:grid w-7 h-7 place-content-center rounded hover:bg-accent">
               <Plus
                 size={18}
                 className="rotate-45"
@@ -79,7 +111,7 @@ export const ActiveTask: React.FC<EditorInterface> = ({ session }) => {
                 }}
               />
             </div>
-          </>
+          </div>
         )}
       </div>
       <Separator />

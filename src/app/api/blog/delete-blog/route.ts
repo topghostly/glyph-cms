@@ -1,44 +1,22 @@
-import { NextRequest, NextResponse } from "next/server";
-import connectToDB from "@/lib/mongodb";
+import { NextResponse } from "next/server";
+import dbConnect from "@/lib/db-connect";
 import Blog from "@/models/blog";
-import { toast } from "sonner";
+import { withAuth } from "@/lib/api-handler";
+import { localIdSchema } from "@/lib/schemas";
 
-export async function DELETE(req: NextRequest) {
-  try {
-    const { _localID } = await req.json();
+export const DELETE = withAuth(localIdSchema, async (body, session) => {
+  await dbConnect();
 
-    // Validate input data
-    if (!_localID) {
-      return NextResponse.json(
-        { error: "_localID is required" },
-        { status: 400 }
-      );
-    }
+  // `creator` in the filter is the authorization check: a post owned by
+  // someone else simply matches nothing.
+  const deleted = await Blog.findOneAndDelete({
+    _localID: body._localID,
+    creator: session.user.id,
+  }).lean();
 
-    await connectToDB();
-
-    // Check if the email already exists
-    const deletedBlog = await Blog.findOneAndDelete({ _localID });
-
-    if (!deletedBlog) {
-      return NextResponse.json(
-        { error: "No blog found with that _localID" },
-        { status: 200 }
-      );
-    }
-
-    // Otherwise delete new user
-    console.log("Blog deleted");
-    return NextResponse.json(
-      { message: "Blog deleted successfully", blog: deletedBlog },
-      { status: 200 }
-    );
-  } catch (e) {
-    console.error(e);
-    toast(`Failed to delete blog, ${e}`);
-    return NextResponse.json(
-      { error: "Failed to delete blog" },
-      { status: 500 }
-    );
+  if (!deleted) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
-}
+
+  return NextResponse.json({ message: "Deleted" }, { status: 200 });
+});
