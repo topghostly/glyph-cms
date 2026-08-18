@@ -21,7 +21,6 @@ import python from "highlight.js/lib/languages/python";
 import { Blog, TiptapDoc } from "@/type/blog";
 import { useEffect, useMemo } from "react";
 import { debounce } from "lodash";
-import HardBreak from "@tiptap/extension-hard-break";
 import { useImageCleanup } from "@/hooks/useImageCleanUp";
 
 // Registering only what we highlight — `common` pulls in ~37 grammars.
@@ -76,11 +75,11 @@ export const TextEditor: React.FC<TextEditorProps> = ({
             class: "list-decimal ml-4",
           },
         },
-        code: {
-          HTMLAttributes: {
-            class: "code bg-gray-900 text-white p-2 rounded",
-          },
-        },
+        // Disabled here so the explicitly configured versions below (styled
+        // Code, syntax-highlighted CodeBlockLowlight) are the only ones
+        // registered — otherwise Tiptap warns about duplicate extensions.
+        code: false,
+        codeBlock: false,
       }),
       TextAlign.configure({
         types: ["heading", "paragraph"],
@@ -117,7 +116,6 @@ export const TextEditor: React.FC<TextEditorProps> = ({
             "rounded-sm my-6 w-full aspect-[16/10] object-cover object-center",
         },
       }),
-      HardBreak,
     ],
     content: "<p>Write your Blog body here! 🌎️</p>",
     editorProps: {

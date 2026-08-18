@@ -10,6 +10,7 @@ export default function AdvertBoard() {
           alt="Glyph"
           className="object-center"
           fill
+          sizes="290px"
         />
       </div>
       <div className="p-5">

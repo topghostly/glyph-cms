@@ -153,8 +153,8 @@ export const Topbar: React.FC<{ session: Session }> = ({ session }) => {
   }, [activeBlog, uploadTrigger]);
 
   return (
-    <div className="px-3 max-w-[1440px] w-full mx-auto h-15 overflow-hidden flex items-center justify-between">
-      <div className="h-full flex gap-3 justify-center items-center select-none">
+    <div className="px-3 w-full min-w-0 h-15 flex items-center justify-between gap-2">
+      <div className="h-full flex gap-3 justify-center items-center select-none shrink-0">
         <Image
           src={"/images/svg/Glyph-01.svg"}
           alt="glyph logo"
@@ -195,7 +195,7 @@ export const Topbar: React.FC<{ session: Session }> = ({ session }) => {
           </Tooltip>
         </TooltipProvider>
       </div>
-      <div className="h-full flex gap-3 justify-center items-center">
+      <div className="h-full flex gap-3 items-center min-w-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {/* STRUCTURE BUTTON */}
         <TooltipProvider>
           <Tooltip>
@@ -203,18 +203,17 @@ export const Topbar: React.FC<{ session: Session }> = ({ session }) => {
               <Button
                 size={"sm"}
                 className={cn(
-                  `${
-                    activeTask === "structure"
-                      ? "text-white/80 text-[12px]"
-                      : "border-none bg-background text-white text-[12px]"
-                  }`
+                  "shrink-0",
+                  activeTask === "structure"
+                    ? "text-white/80 text-[12px]"
+                    : "border-none bg-background text-white text-[12px]"
                 )}
                 variant={"outline"}
                 onClick={() => setActiveTask("structure")}
                 disabled={!activeTask}
               >
                 <LayoutPanelTop />
-                Structure
+                <span className="hidden sm:inline">Structure</span>
               </Button>
             </TooltipTrigger>
             <TooltipContent>
@@ -230,11 +229,10 @@ export const Topbar: React.FC<{ session: Session }> = ({ session }) => {
                 variant={"outline"}
                 size={"sm"}
                 className={cn(
-                  `${
-                    activeTask === "preview"
-                      ? "text-white/80 text-[12px]"
-                      : "border-none bg-background text-white text-[12px]"
-                  }`
+                  "shrink-0",
+                  activeTask === "preview"
+                    ? "text-white/80 text-[12px]"
+                    : "border-none bg-background text-white text-[12px]"
                 )}
                 onClick={() => {
                   window.open("/preview", "_blank");
@@ -247,7 +245,7 @@ export const Topbar: React.FC<{ session: Session }> = ({ session }) => {
                 }
               >
                 <Columns2 />
-                Preview
+                <span className="hidden sm:inline">Preview</span>
               </Button>
             </TooltipTrigger>
             <TooltipContent>
@@ -263,16 +261,16 @@ export const Topbar: React.FC<{ session: Session }> = ({ session }) => {
                 variant={"outline"}
                 size={"sm"}
                 className={cn(
-                  `${
-                    activeTask === "code"
-                      ? "text-white/80 text-[12px]"
-                      : "border-none bg-background text-white text-[12px]"
-                  }`
+                  "shrink-0",
+                  activeTask === "code"
+                    ? "text-white/80 text-[12px]"
+                    : "border-none bg-background text-white text-[12px]"
                 )}
                 onClick={() => setActiveTask("code")}
                 disabled={!activeTask}
               >
-                <FileJson size={16} /> JSON
+                <FileJson size={16} />
+                <span className="hidden sm:inline">JSON</span>
               </Button>
             </TooltipTrigger>
             <TooltipContent>
@@ -281,13 +279,13 @@ export const Topbar: React.FC<{ session: Session }> = ({ session }) => {
           </Tooltip>
         </TooltipProvider>
       </div>
-      <div className="h-full flex gap-5 justify-center items-center">
+      <div className="h-full flex gap-5 justify-center items-center shrink-0">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
               <div>
                 <p className="text-[13px] text-white/30">
-                  Blog status{" "}
+                  <span className="hidden sm:inline">Blog status</span>
                   <span
                     className={cn(
                       "w-1.5 h-1.5 rounded-full inline-block ml-1",
@@ -344,6 +342,7 @@ export const Topbar: React.FC<{ session: Session }> = ({ session }) => {
                 src={session?.user?.image ?? "/images/png/web-icon.png"}
                 alt="user picture"
                 fill
+                sizes="30px"
                 className="pointer-events-none"
               />
             </div>

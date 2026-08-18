@@ -55,6 +55,7 @@ export const CategoryLayer: React.FC = () => {
                 }
                 alt={"post image"}
                 fill
+                sizes="40px"
               />
             </div>
             <div className="flex flex-col ">

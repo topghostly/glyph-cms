@@ -10,7 +10,14 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useBlogStore } from "@/store/blog-store";
-import { Ellipsis, Plus, Search, Trash2, UserRoundPen } from "lucide-react";
+import {
+  Ellipsis,
+  FileText,
+  Plus,
+  Search,
+  Trash2,
+  UserRoundPen,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Session } from "next-auth";
 
@@ -24,6 +31,7 @@ export const PostLayer: React.FC<{ session: Session }> = ({ session }) => {
   const activeBlog = useBlogStore((state) => state.activeBlog);
   const setActiveBlog = useBlogStore((state) => state.setActiveBlog);
   const addBlog = useBlogStore((state) => state.addBlog);
+  const isSyncing = useBlogStore((state) => state.isSyncing);
   /* IMPORT BLOG CONTEXT FUNCTIONS AND PROPERTIES */
 
   /* FUNCTION TO DELETE A BLOG */
@@ -93,7 +101,15 @@ export const PostLayer: React.FC<{ session: Session }> = ({ session }) => {
   return (
     <div className="flex flex-col gap-1">
       <div className="flex justify-between items-center mb-4">
-        <p className="font-bold text-[14px]">Posts</p>
+        <p className="font-bold text-[14px] flex items-center gap-2">
+          Posts
+          {isSyncing && (
+            <span
+              aria-label="Syncing"
+              className="w-3 h-3 border-1 border-white/50 border-t-transparent rounded-full animate-spin"
+            />
+          )}
+        </p>
         <div
           className="w-7 h-7 grid place-content-center hover:bg-accent rounded"
           onClick={() => {
@@ -130,6 +146,20 @@ export const PostLayer: React.FC<{ session: Session }> = ({ session }) => {
         </div>
       </div>
       {/* SEARCH INPUT FIELD */}
+
+      {filteredBlogs.length === 0 && (
+        <div className="flex flex-col items-center justify-center gap-2 py-10 text-white/40">
+          <FileText size={22} strokeWidth={1.5} />
+          <p className="text-[12px] text-center px-4">
+            {userBlogs.length === 0
+              ? isSyncing
+                ? "Syncing your posts…"
+                : "No posts yet — create your first one."
+              : "No posts match your search."}
+          </p>
+        </div>
+      )}
+
       <div className="flex flex-col gap-1 w-full">
         {filteredBlogs.map((d) => (
           <div
@@ -156,8 +186,8 @@ export const PostLayer: React.FC<{ session: Session }> = ({ session }) => {
                 className="rounded object-center object-cover"
               />
             </div>
-            <div className="flex flex-col">
-              <p className="text-[14px] font-bold truncate w-[170px]">
+            <div className="flex flex-col min-w-0">
+              <p className="text-[14px] font-bold truncate">
                 {d.content.title !== "" ? d.content.title : "Untitled Blog"}
               </p>
               <p className="text-[10px]">{session.user.name}</p>

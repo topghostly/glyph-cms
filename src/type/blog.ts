@@ -91,6 +91,8 @@ export type BlogState = {
   setIsSearcing: (mode: boolean) => void;
   listMode: "all" | "category";
   setListMode: (mode: "all" | "category") => void;
+  isSyncing: boolean;
+  setIsSyncing: (syncing: boolean) => void;
 };
 
 export interface BlogUpload {
