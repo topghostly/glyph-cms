@@ -9,6 +9,7 @@ export type PostCreator = { fullname: string; image: string } | null;
 export type Post = {
   content: BlogContentProp;
   creator: PostCreator;
+  publishedAt: string | null;
 };
 
 /**
@@ -21,8 +22,8 @@ export const getPost = cache(async (id: string): Promise<Post | null> => {
     await dbConnect();
 
     const blog = await Blog.findOne({ _localID: id })
-      .select("content creator")
-      .lean<{ content: string; creator: string } | null>();
+      .select("content creator createdAt")
+      .lean<{ content: string; creator: string; createdAt?: Date } | null>();
 
     if (!blog) return null;
 
@@ -39,6 +40,7 @@ export const getPost = cache(async (id: string): Promise<Post | null> => {
       creator: creator
         ? { fullname: creator.fullname, image: creator.image }
         : null,
+      publishedAt: blog.createdAt ? blog.createdAt.toISOString() : null,
     };
   } catch (err) {
     console.error("[getPost]", err);

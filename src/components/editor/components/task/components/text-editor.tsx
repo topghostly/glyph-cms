@@ -10,6 +10,7 @@ import Link from "@tiptap/extension-link";
 import Underline from "@tiptap/extension-underline";
 import Image from "@tiptap/extension-image";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
+import Placeholder from "@tiptap/extension-placeholder";
 import { createLowlight } from "lowlight";
 import js from "highlight.js/lib/languages/javascript";
 import ts from "highlight.js/lib/languages/typescript";
@@ -116,51 +117,21 @@ export const TextEditor: React.FC<TextEditorProps> = ({
             "rounded-sm my-6 w-full aspect-[16/10] object-cover object-center",
         },
       }),
+      // A real placeholder: shown via CSS when the doc is empty, never
+      // part of the document itself. The previous approach set the hint
+      // text as actual initial content, so typing appended to it instead
+      // of replacing it — "Write your Blog body here! 🌎️" ended up saved
+      // as part of every new post's real body.
+      Placeholder.configure({
+        placeholder: "Write your blog body here...",
+      }),
     ],
-    content: "<p>Write your Blog body here! 🌎️</p>",
     editorProps: {
       attributes: {
         class:
           "prose prose-invert max-w-none w-full max-h-[80vh] min-h-[300px] overflow-y-scroll scrollbar-h pt-3 px-2 pb-3 border border-accent rounded outline-accent",
       },
     },
-    // editorProps: {
-    //   handlePaste(view, event) {
-    //     const text = event.clipboardData?.getData("text/plain");
-    //     if (!text) return false;
-
-    //     // Split the text by double newlines to create paragraphs
-    //     const paragraphs = text.split(/\n{2,}/);
-    //     const { schema } = view.state;
-    //     const nodes: any[] = [];
-
-    //     for (const para of paragraphs) {
-    //       // Split paragraph by single newlines to insert hard breaks
-    //       const lines = para.split("\n");
-    //       const paragraphContent = lines.flatMap((line, index) => {
-    //         const lineNodes = [schema.text(line)];
-    //         if (index !== lines.length - 1) {
-    //           lineNodes.push(schema.nodes.hardBreak.create());
-    //         }
-    //         return lineNodes;
-    //       });
-
-    //       const paragraphNode = schema.nodes.paragraph.create(
-    //         {},
-    //         paragraphContent
-    //       );
-    //       nodes.push(paragraphNode);
-    //     }
-
-    //     const fragment =
-    //       schema.nodes.doc.contentMatch.defaultType?.createAndFill?.({}, nodes);
-    //     if (!fragment) return false;
-
-    //     view.dispatch(view.state.tr.replaceSelectionWith(fragment));
-    //     event.preventDefault();
-    //     return true;
-    //   },
-    // },
     onUpdate: ({ editor }) => handleUpdate(editor),
     immediatelyRender: false,
   });

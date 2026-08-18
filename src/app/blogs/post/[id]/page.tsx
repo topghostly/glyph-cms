@@ -38,6 +38,7 @@ export async function generateMetadata({
       description,
       images: [{ url: image, width: 1200, height: 630, alt: title }],
       type: "article",
+      publishedTime: post.publishedAt ?? undefined,
     },
     twitter: {
       card: "summary_large_image",
@@ -54,5 +55,11 @@ export default async function Page({ params }: PageProps) {
 
   if (!post) return <ErrorPage />;
 
-  return <PostView content={post.content} creator={post.creator} />;
+  return (
+    <PostView
+      content={post.content}
+      creator={post.creator}
+      publishedAt={post.publishedAt}
+    />
+  );
 }
